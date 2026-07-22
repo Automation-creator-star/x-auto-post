@@ -13,6 +13,8 @@ import datetime
 import os
 import shutil
 import sys
+import urllib.parse
+import urllib.request
 
 import tweepy
 
@@ -29,6 +31,25 @@ def current_slot(now):
     if 19 <= h <= 23:
         return "night"
     return None
+
+
+def notify_chatwork(message):
+    """Send a message to Chatwork; never raise (notification is best-effort)."""
+    token = os.environ.get("CHATWORK_API_TOKEN")
+    room = os.environ.get("CHATWORK_ROOM_ID")
+    if not token or not room:
+        return
+    try:
+        req = urllib.request.Request(
+            f"https://api.chatwork.com/v2/rooms/{room}/messages",
+            data=urllib.parse.urlencode({"body": message}).encode(),
+            headers={"X-ChatWorkToken": token},
+            method="POST",
+        )
+        urllib.request.urlopen(req, timeout=15)
+        print("Chatwork notified.")
+    except Exception as e:  # noqa: BLE001
+        print(f"Chatwork notification failed: {e}", file=sys.stderr)
 
 
 def main():
@@ -79,16 +100,26 @@ def main():
             resp = client.create_tweet(text=text, media_ids=media_ids)
         else:
             resp = client.create_tweet(text=text)
-    except tweepy.errors.Forbidden as e:
+    except Exception as e:
         # e.g. duplicate content; archive so we don't retry forever
-        print(f"Forbidden (possibly duplicate): {e}", file=sys.stderr)
+        print(f"Post failed: {e}", file=sys.stderr)
         shutil.move(txt_path, os.path.join(ROOT, "posted", "FAILED-" + base + ".txt"))
         if os.path.exists(png_path):
             shutil.move(png_path, os.path.join(ROOT, "posted", "FAILED-" + base + ".png"))
+        notify_chatwork(
+            f"[info][title]X自動投稿: 失敗[/title]{base} の投稿に失敗しました。\n"
+            f"エラー: {e}\n文面はリポジトリの posted/FAILED-{base}.txt に退避しています。[/info]"
+        )
         sys.exit(1)
 
     tweet_id = resp.data["id"]
-    print(f"Posted {base}: https://x.com/nespe_shacho/status/{tweet_id}")
+    url = f"https://x.com/nespe_shacho/status/{tweet_id}"
+    print(f"Posted {base}: {url}")
+    slot_names = {"morning": "朝・用語解説", "noon": "昼・ITニュース", "night": "夜・キャリア"}
+    notify_chatwork(
+        f"[info][title]X自動投稿: 完了 ({slot_names.get(slot, slot)})[/title]"
+        f"{text[:60]}{'…' if len(text) > 60 else ''}\n{url}[/info]"
+    )
     shutil.move(txt_path, os.path.join(ROOT, "posted", base + ".txt"))
     if os.path.exists(png_path):
         shutil.move(png_path, os.path.join(ROOT, "posted", base + ".png"))
