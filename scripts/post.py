@@ -7,7 +7,10 @@ file to posted/. If a matching .png exists alongside the .txt, it is
 uploaded and attached to the post (falls back to text-only if the
 media upload fails). Missing queue file = skip quietly (exit 0).
 
-Slots (JST): morning 06-10 / noon 11-14 / night 19-23
+Slots (JST): morning 08-10 / noon 12-14 / night 21-23
+The workflow fires every ~20 minutes inside these windows; the first
+run that finds the slot's queue file posts it (the file is then moved
+to posted/, so later runs in the same window do nothing).
 """
 import datetime
 import os
@@ -24,11 +27,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def current_slot(now):
     h = now.hour
-    if 6 <= h <= 10:
+    if 8 <= h <= 10:
         return "morning"
-    if 11 <= h <= 14:
+    if 12 <= h <= 14:
         return "noon"
-    if 19 <= h <= 23:
+    if 21 <= h <= 23:
         return "night"
     return None
 

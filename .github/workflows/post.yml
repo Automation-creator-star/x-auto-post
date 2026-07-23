@@ -2,12 +2,12 @@ name: Post to X
 
 on:
   schedule:
-    # JST 08:00 = UTC 23:00 (previous day)
-    - cron: '0 23 * * *'
-    # JST 12:15 = UTC 03:15
-    - cron: '15 3 * * *'
-    # JST 21:00 = UTC 12:00
-    - cron: '0 12 * * *'
+    # GitHub cron is unreliable (delays of minutes to hours), so instead of
+    # firing once at the exact time, fire every ~20 min during the posting
+    # windows; scripts/post.py posts the slot's queued file exactly once.
+    # morning 08-10 JST = 23,0,1 UTC / noon 12-14 JST = 3,4,5 UTC /
+    # night 21-23 JST = 12,13,14 UTC
+    - cron: '3,23,43 23,0,1,3,4,5,12,13,14 * * *'
   workflow_dispatch:
     inputs:
       force_slot:
