@@ -1,10 +1,16 @@
 name: Post to X
 
 on:
+  # Primary trigger: a push to main. Reliable CCR "poke" scheduled tasks push an
+  # empty commit at each posting time (see ScheduleWakeup/create_trigger), which
+  # fires this workflow. scripts/post.py only posts if the current JST time is in
+  # a slot window AND that slot's queue file exists; otherwise it exits cleanly.
+  # Archive commits carry [skip ci] so they never re-trigger a run.
+  push:
+    branches: [main]
   schedule:
-    # GitHub cron is unreliable (delays of minutes to hours), so instead of
-    # firing once at the exact time, fire every ~20 min during the posting
-    # windows; scripts/post.py posts the slot's queued file exactly once.
+    # Backup trigger. GitHub cron is unreliable (delays/skips), so it only serves
+    # as a safety net. Fires every ~20 min during the posting windows.
     # morning 08-10 JST = 23,0,1 UTC / noon 12-14 JST = 3,4,5 UTC /
     # night 21-23 JST = 12,13,14 UTC
     - cron: '3,23,43 23,0,1,3,4,5,12,13,14 * * *'
