@@ -47,7 +47,10 @@ def notify_chatwork(message):
     try:
         req = urllib.request.Request(
             f"https://api.chatwork.com/v2/rooms/{room}/messages",
-            data=urllib.parse.urlencode({"body": message}).encode(),
+            # self_unread=1 marks the message unread even for the sender, so the
+            # room shows an unread badge (Chatwork otherwise treats messages
+            # posted with the owner's own token as already read).
+            data=urllib.parse.urlencode({"body": message, "self_unread": 1}).encode(),
             headers={"X-ChatWorkToken": token},
             method="POST",
         )
