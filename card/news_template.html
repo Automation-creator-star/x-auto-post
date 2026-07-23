@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 675px;
+    font-family: "Noto Sans CJK JP", sans-serif;
+    background: linear-gradient(135deg, #0b1c33 0%, #10294a 60%, #123156 100%);
+    color: #ffffff; position: relative; overflow: hidden;
+  }
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(251,191,36,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(251,191,36,0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .accent { position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: linear-gradient(#fbbf24, #f97316); }
+  .content { position: relative; padding: 52px 64px 44px 76px; height: 100%; display: flex; flex-direction: column; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: #f59e0b; color: #1a1200;
+    font-weight: 800; font-size: 27px;
+    padding: 9px 26px; border-radius: 10px;
+    letter-spacing: 1px; width: fit-content;
+  }
+  .badge .dot { width: 14px; height: 14px; border-radius: 50%; background: #b91c1c; box-shadow: 0 0 0 4px rgba(185,28,28,0.3); }
+  .headline {
+    margin-top: 30px; font-size: __HEAD_SIZE__px; font-weight: 900;
+    line-height: 1.32; letter-spacing: 1px; max-width: 1060px;
+  }
+  .headline .hi { color: #fcd34d; }
+  .chips { margin-top: 26px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .chip {
+    background: rgba(251,191,36,0.14); border: 2px solid #f59e0b;
+    color: #fde68a; font-weight: 800; font-size: 27px;
+    padding: 10px 22px; border-radius: 999px;
+  }
+  .body {
+    margin-top: 26px; font-size: 29px; line-height: 1.55; color: #dbeafe;
+    font-weight: 500; max-width: 1060px;
+  }
+  .spacer { flex: 1; }
+  .footer {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 2px solid rgba(251,191,36,0.3); padding-top: 20px;
+  }
+  .brand { font-size: 26px; font-weight: 700; color: #e2e8f0; }
+  .brand span { color: #fbbf24; }
+  .src { font-size: 23px; color: #94a3b8; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="accent"></div>
+  <div class="content">
+    <div class="badge"><span class="dot"></span>ITニュース</div>
+    <div class="headline">__HEADLINE__</div>
+    <div class="chips">__CHIPS__</div>
+    <div class="body">__BODY__</div>
+    <div class="spacer"></div>
+    <div class="footer">
+      <div class="brand">ネスペ社長 <span>@nespe_shacho</span></div>
+      <div class="src">__SOURCE__</div>
+    </div>
+  </div>
+</body>
+</html>
