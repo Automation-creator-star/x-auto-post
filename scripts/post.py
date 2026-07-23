@@ -27,9 +27,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def current_slot(now):
     h = now.hour
-    if 8 <= h <= 10:
+    # Windows are wide so a trigger (poke/cron) delayed by up to ~1-3h still
+    # lands in the right slot. Each slot's queue file is posted once, then moved.
+    if 8 <= h <= 11:
         return "morning"
-    if 12 <= h <= 14:
+    if 12 <= h <= 17:
         return "noon"
     if 21 <= h <= 23:
         return "night"

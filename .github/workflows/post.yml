@@ -10,10 +10,10 @@ on:
     branches: [main]
   schedule:
     # Backup trigger. GitHub cron is unreliable (delays/skips), so it only serves
-    # as a safety net. Fires every ~20 min during the posting windows.
-    # morning 08-10 JST = 23,0,1 UTC / noon 12-14 JST = 3,4,5 UTC /
+    # as a safety net. Fires every ~20 min across the (widened) posting windows.
+    # morning 08-11 JST = 23,0,1,2 UTC / noon 12-17 JST = 3,4,5,6,7,8 UTC /
     # night 21-23 JST = 12,13,14 UTC
-    - cron: '3,23,43 23,0,1,3,4,5,12,13,14 * * *'
+    - cron: '3,23,43 23,0,1,2,3,4,5,6,7,8,12,13,14 * * *'
   workflow_dispatch:
     inputs:
       force_slot:
