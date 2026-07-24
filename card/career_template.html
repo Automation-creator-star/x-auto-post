@@ -5,9 +5,9 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    width: 1200px; height: 675px;
+    width: 1080px; height: 1350px;
     font-family: "Noto Sans CJK JP", sans-serif;
-    background: linear-gradient(135deg, #0b1c33 0%, #10294a 55%, #0f2f2a 100%);
+    background: linear-gradient(150deg, #0b1c33 0%, #10294a 55%, #0f2f2a 100%);
     color: #ffffff; position: relative; overflow: hidden;
   }
   .grid-bg {
@@ -15,39 +15,35 @@
     background-image:
       linear-gradient(rgba(16,185,129,0.06) 1px, transparent 1px),
       linear-gradient(90deg, rgba(16,185,129,0.06) 1px, transparent 1px);
-    background-size: 48px 48px;
+    background-size: 54px 54px;
   }
-  .accent { position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: linear-gradient(#34d399, #059669); }
+  .accent { position: absolute; left: 0; top: 0; bottom: 0; width: 16px; background: linear-gradient(#34d399, #059669); }
   .quote-mark {
-    position: absolute; right: 60px; top: 30px;
-    font-size: 220px; line-height: 1; color: rgba(52,211,153,0.14);
-    font-family: Georgia, serif; font-weight: 900;
+    position: absolute; right: 66px; top: 40px; font-size: 300px; line-height: 1;
+    color: rgba(52,211,153,0.14); font-family: Georgia, serif; font-weight: 900;
   }
-  .content { position: relative; padding: 52px 64px 44px 76px; height: 100%; display: flex; flex-direction: column; }
+  .content { position: relative; padding: 76px 64px 60px 80px; height: 100%; display: flex; flex-direction: column; }
+  .main { flex: 1; display: flex; flex-direction: column; justify-content: center; }
   .badge {
     display: inline-flex; align-items: center; gap: 12px;
-    background: #10b981; color: #04231a;
-    font-weight: 800; font-size: 26px;
-    padding: 9px 26px; border-radius: 999px;
-    letter-spacing: 2px; width: fit-content;
+    background: #10b981; color: #04231a; font-weight: 800; font-size: 34px;
+    padding: 12px 34px; border-radius: 999px; letter-spacing: 3px; width: fit-content;
   }
   .headline {
-    margin-top: 34px; font-size: __HEAD_SIZE__px; font-weight: 900;
-    line-height: 1.4; letter-spacing: 1px; max-width: 1010px;
+    font-size: __HEAD_SIZE__px; font-weight: 900; line-height: 1.44; letter-spacing: 1px;
   }
   .headline .hi { color: #6ee7b7; }
   .body {
-    margin-top: 28px; font-size: 30px; line-height: 1.6; color: #d1fae5;
-    font-weight: 500; max-width: 1010px;
+    margin-top: 44px; font-size: 42px; line-height: 1.66; color: #d1fae5; font-weight: 500;
   }
   .spacer { flex: 1; }
   .footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 2px solid rgba(52,211,153,0.3); padding-top: 20px;
+    border-top: 3px solid rgba(52,211,153,0.3); padding-top: 28px;
   }
-  .brand { font-size: 26px; font-weight: 700; color: #e2e8f0; }
+  .brand { font-size: 34px; font-weight: 700; color: #e2e8f0; }
   .brand span { color: #34d399; }
-  .note { font-size: 24px; color: #94a3b8; font-weight: 500; }
+  .note { font-size: 30px; color: #94a3b8; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -56,9 +52,10 @@
   <div class="quote-mark">&rdquo;</div>
   <div class="content">
     <div class="badge">__BADGE__</div>
-    <div class="headline">__HEADLINE__</div>
-    <div class="body">__BODY__</div>
-    <div class="spacer"></div>
+    <div class="main">
+      <div class="headline">__HEADLINE__</div>
+      <div class="body">__BODY__</div>
+    </div>
     <div class="footer">
       <div class="brand">ネスペ社長 <span>@nespe_shacho</span></div>
       <div class="note">元インフラエンジニア社長の視点</div>

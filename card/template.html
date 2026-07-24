@@ -5,60 +5,52 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    width: 1200px; height: 675px;
+    width: 1080px; height: 1350px;
     font-family: "Noto Sans CJK JP", sans-serif;
-    background: linear-gradient(135deg, #0b1c33 0%, #10294a 60%, #123156 100%);
-    color: #ffffff;
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(150deg, #0b1c33 0%, #10294a 60%, #123156 100%);
+    color: #ffffff; position: relative; overflow: hidden;
   }
   .grid-bg {
     position: absolute; inset: 0;
     background-image:
       linear-gradient(rgba(96,165,250,0.07) 1px, transparent 1px),
       linear-gradient(90deg, rgba(96,165,250,0.07) 1px, transparent 1px);
-    background-size: 48px 48px;
+    background-size: 54px 54px;
   }
-  .content { position: relative; padding: 52px 64px; height: 100%; display: flex; flex-direction: column; }
+  .content { position: relative; padding: 70px 64px 60px; height: 100%; display: flex; flex-direction: column; }
   .badge {
-    display: inline-block;
-    background: #38bdf8; color: #062038;
-    font-weight: 700; font-size: 26px;
-    padding: 8px 26px; border-radius: 999px;
-    letter-spacing: 2px;
-    width: fit-content;
+    display: inline-block; background: #38bdf8; color: #062038;
+    font-weight: 700; font-size: 34px; padding: 12px 34px;
+    border-radius: 999px; letter-spacing: 3px; width: fit-content;
   }
-  .term-row { display: flex; align-items: baseline; gap: 24px; margin-top: 28px; }
-  .term { font-size: __TERM_SIZE__px; font-weight: 900; letter-spacing: 2px; line-height: 1; }
-  .term-sub { font-size: 30px; color: #93c5fd; font-weight: 700; }
+  .term { margin-top: 46px; font-size: __TERM_SIZE__px; font-weight: 900; letter-spacing: 2px; line-height: 1.02; }
+  .term-sub { margin-top: 16px; font-size: 40px; color: #93c5fd; font-weight: 700; }
   .desc {
-    margin-top: 22px; font-size: 30px; line-height: 1.55; color: #dbeafe;
-    font-weight: 500; max-width: 1080px;
+    margin-top: 40px; font-size: 42px; line-height: 1.6; color: #dbeafe; font-weight: 500;
   }
   .desc b { color: #7dd3fc; }
-  .diagram { margin-top: 30px; flex: 1; display: flex; align-items: center; }
+  .diagram { margin-top: 54px; flex: 1; display: flex; align-items: center; justify-content: center; }
+  .diagram svg { width: 100%; height: auto; }
   .footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 2px solid rgba(147,197,253,0.35); padding-top: 20px;
+    border-top: 3px solid rgba(147,197,253,0.35); padding-top: 28px;
   }
-  .brand { font-size: 26px; font-weight: 700; color: #e2e8f0; }
+  .brand { font-size: 34px; font-weight: 700; color: #e2e8f0; }
   .brand span { color: #38bdf8; }
-  .note { font-size: 24px; color: #94a3b8; font-weight: 500; }
+  .note { font-size: 30px; color: #94a3b8; font-weight: 500; }
 </style>
 </head>
 <body>
   <div class="grid-bg"></div>
   <div class="content">
     <div class="badge">用語解説</div>
-    <div class="term-row">
-      <div class="term">__TERM__</div>
-      <div class="term-sub">__SUB__</div>
-    </div>
+    <div class="term">__TERM__</div>
+    <div class="term-sub">__SUB__</div>
     <div class="desc">__DESC__</div>
     <div class="diagram">__DIAGRAM__</div>
     <div class="footer">
       <div class="brand">ネスペ社長 <span>@nespe_shacho</span></div>
-      <div class="note">毎朝8時にネットワーク用語を1つ解説</div>
+      <div class="note">毎朝8時にネットワーク用語を解説</div>
     </div>
   </div>
 </body>

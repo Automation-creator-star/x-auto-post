@@ -43,7 +43,7 @@ def main():
 
     with sync_playwright() as p:
         b = p.chromium.launch()
-        pg = b.new_page(viewport={"width": 1200, "height": 675}, device_scale_factor=2)
+        pg = b.new_page(viewport={"width": 1080, "height": 1350}, device_scale_factor=2)
         pg.goto("file://" + tmp)
         pg.wait_for_timeout(400)
         pg.screenshot(path=out_path)
