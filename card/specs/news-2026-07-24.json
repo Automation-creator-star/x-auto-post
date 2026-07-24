@@ -1,0 +1,7 @@
+{
+  "headline": "Check Point管理画面に<span class=\"hi\">認証回避</span>の脆弱性",
+  "chips": ["CVSS 9.3", "悪用確認済み", "CISA登録"],
+  "body": "未認証の攻撃者が管理者としてログインでき、セキュリティポリシーを改ざんされる恐れ。管理画面は外部に公開せず、速やかにパッチ適用を。",
+  "source": "(出典: The Hacker News)",
+  "head_size": 46
+}
