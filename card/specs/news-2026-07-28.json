@@ -1,0 +1,6 @@
+{
+  "headline": "AWSで<span class=\"hi\">また障害</span> 5月以降3回目",
+  "chips": ["約80分", "us-west-2", "Apple Pay等に影響"],
+  "body": "7月24日、米オレゴンリージョンで通信障害。Apple PayやReddit、PSNなどが約80分つながりにくくなりました。クラウドも「止まる前提」で冗長化を考える視点が大切です。",
+  "source": "(出典: 財経新聞)"
+}
