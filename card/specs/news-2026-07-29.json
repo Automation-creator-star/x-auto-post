@@ -1,0 +1,6 @@
+{
+  "headline": "<span class=\"hi\">AIエージェント</span>が攻撃を自動化",
+  "chips": ["Hermes", "人の承認なし", "タイ財務省を標的"],
+  "body": "タイ財務省を狙った攻撃で、オープンソースのAIエージェント「Hermes」の悪用を研究者が報告。侵入後の調査作業を、人の承認なしに自動で実行していました。",
+  "source": "(出典: BleepingComputer)"
+}
