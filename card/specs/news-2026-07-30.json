@@ -1,0 +1,6 @@
+{
+  "headline": "VMwareに<span class=\"hi\">深刻な脆弱性</span>、修正版公開",
+  "chips": ["CVSS 9.8", "認証回避", "VMエスケープ"],
+  "body": "vCenterの認証回避や、仮想マシンからホストへ抜け出す「VMエスケープ」が判明。仮想化基盤は企業インフラの土台のため、早めのパッチ適用が重要です。",
+  "source": "(出典: The Hacker News)"
+}
