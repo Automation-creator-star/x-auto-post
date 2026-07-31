@@ -1,0 +1,7 @@
+{
+  "headline": "SD-WAN管理基盤に<span class=\"hi\">CVSS 10.0</span>の脆弱性",
+  "chips": ["CVSS 10.0", "ゼロデイ", "認証不要"],
+  "body": "SD-WANの管理サーバ「VeloCloud Orchestrator」に認証不要で悪用できる欠陥。攻撃も確認済みで、修正版の適用が急務です。",
+  "source": "(出典: SecurityWeek)",
+  "head_size": 46
+}
