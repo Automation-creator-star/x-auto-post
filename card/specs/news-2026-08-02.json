@@ -1,0 +1,7 @@
+{
+  "headline": "Cisco製FMCに<span class=\"hi\">固定パスワード</span>の脆弱性",
+  "chips": ["CVE-2026-20316", "CVSS 5.3", "悪用確認済み"],
+  "body": "ファイアウォール管理製品「Secure FMC」に、埋め込まれた固定アカウントでログインできる欠陥。既に悪用が確認され、米CISAも早急な対処を求めています。",
+  "source": "(出典: Help Net Security)",
+  "head_size": 46
+}
