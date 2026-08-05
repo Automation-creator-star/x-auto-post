@@ -1,0 +1,7 @@
+{
+  "headline": "遠隔管理ツール悪用で<span class=\"hi\">顧客端末に侵入</span>",
+  "chips": ["CVSS 8.2", "CISA注意喚起", "悪用確認済み"],
+  "body": "多数の企業端末を一括管理するRMM「N-able N-central」の認証バイパス脆弱性が悪用されました。管理サーバー1台の侵害が多くの組織への侵入に直結する点が、RMM攻撃の怖さです。",
+  "source": "(出典: Security NEXT / The Hacker News)",
+  "head_size": 46
+}
