@@ -1,0 +1,1 @@
+【ITニュース】米CISAが、AI開発ツール「Langflow」やApache Tomcatなど脆弱性3件の悪用を確認し、KEVカタログに追加。Langflowは認証なしで遠隔コード実行が可能(CVSS 9.8)。修正版が出ても適用しなければ狙われ続けます。KEVの定期確認はインフラ担当の基本です。(出典: BleepingComputer)

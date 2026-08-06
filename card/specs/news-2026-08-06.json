@@ -1,0 +1,6 @@
+{
+  "headline": "Tomcat等 脆弱性3件の<span class=\"hi\">悪用を確認</span>",
+  "chips": ["Langflow", "Tomcat", "CVSS 9.8"],
+  "body": "米CISAは、AI開発ツールLangflowやApache Tomcatなどの脆弱性3件が実際の攻撃で悪用されているとして、悪用済み脆弱性カタログ(KEV)に追加。速やかなパッチ適用を呼びかけています。",
+  "source": "(出典: BleepingComputer)"
+}
