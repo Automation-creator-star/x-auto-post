@@ -1,0 +1,6 @@
+{
+  "headline": "Metabaseに<span class=\"hi\">ゼロデイ攻撃</span><br>顧客情報が流出",
+  "chips": ["CVSS 10.0", "SQLインジェクション", "Framework等で被害"],
+  "body": "BIツール「Metabase」の脆弱性が修正版の公開前に悪用され、PCメーカーFrameworkなど複数社で顧客情報が流出。認証なしで管理者権限を奪える深刻な欠陥でした。自社運用中なら修正版の即適用を。",
+  "source": "(出典: BleepingComputer)"
+}
