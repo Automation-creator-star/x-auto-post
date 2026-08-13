@@ -24,8 +24,9 @@ import urllib.request
 MODEL = "claude-sonnet-4-5"
 JST = datetime.timezone(datetime.timedelta(hours=9))
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LINE_URL = "https://x.gd/Et9Ri"
-BANNER = os.path.join(ROOT, "assets", "line_banner.png")
+# Tue/Fri night = InfraGym promo (free gamified CCNA training app).
+INFRAGYM_URL = "https://lp.theit.co.jp/p/DbzLM6ruxTc8?ftid=G9bN143EI7nd"
+INFRAGYM_BANNER = os.path.join(ROOT, "assets", "infragym_banner.png")
 
 # NESPE campaign: during this window the night slot becomes a campaign post
 # driving to the LP (replacing the usual career / LINE-CCNA nights).
@@ -120,15 +121,31 @@ def gen_career(api_key):
     return anthropic(api_key, prompt, max_tokens=1500)
 
 
-def gen_link(api_key, pattern):
-    style = ("質問への回答+実績(資格取得者1,000名超・転職成功800名超)で自然に誘導"
-             if pattern == "C" else
-             "学習法・挫折ポイントの話から『学習手順を無料LINE講座にまとめた』と誘導。文末に『毎日5分読むだけの構成です。』等の一言")
-    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、CCNA教育)の夜の投稿を作ります。無料のLINE CCNA講座({LINE_URL})への誘導投稿を1つ。{style}。宣伝くさくなりすぎず自然に。#タグや問いかけは不要。
+def gen_infragym(api_key, pattern):
+    style = (
+        "『参考書だけだと丸暗記で心が折れがち』という挫折ポイントの共感から、"
+        "『手を動かして・ゲーム感覚で(レベルや称号)続けられる無料アプリ InfraGym を使ってみて』と自然に誘導"
+        if pattern == "pain" else
+        "『毎日たった5分、指を動かすだけでCCNAがサクサク進む』という切り口で、"
+        "レベル・称号・模試つきのゲーム感覚の無料アプリ InfraGym を軽やかに紹介"
+    )
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・CCNA教育)の夜の投稿を作ります。
+無料のCCNA学習アプリ「InfraGym(インフラジム)」への誘導投稿を1つ。
+アプリの事実: CCNA 200-301を「手を動かして」攻略する無料トレーニングアプリ。1日5分、図解＋クイズ。レベル・XP・称号・実績バッジでゲーム感覚に続けられる。CCNA全1091問・実力テスト(模試)つき。延べ1,000名を合格へ導いた現役講師が監修。登録なしですぐ始められスマホだけで完結。誇大表現(絶対合格・誰でも等)は禁止、事実ベースで誠実に。
+今回の切り口: {style}。宣伝くさくなりすぎず、社長本人の一言として自然に。
 
 次のJSONだけを```json ... ```で出力:
-{{"post": "投稿本文。改行で {LINE_URL} を必ず1回含める。日本語全角=2/半角=1・URLは23としてで270単位以内。"}}"""
-    return anthropic(api_key, prompt, max_tokens=800)
+{{"post": "投稿本文。改行で {INFRAGYM_URL} を必ず1回含める。文末で『無料で試してみて』的に軽く促す。日本語全角=2/半角=1・URLは23として270単位以内。ハッシュタグは付けても #CCNA を1個だけ、無くてもよい。"}}"""
+    s = anthropic(api_key, prompt, max_tokens=800)
+    for _ in range(2):
+        if wlen(s.get("post", "")) <= 270:
+            break
+        s = anthropic(
+            api_key,
+            prompt + f"\n\n【再指示】前回が長すぎました。{INFRAGYM_URL} を除いた地の文を削り、全体を250単位以内に必ず収めてください。",
+            max_tokens=800,
+        )
+    return s
 
 
 CAMPAIGN_ANGLES = [
@@ -226,12 +243,12 @@ def main():
                            | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
                            npng)
                     made.append(f"{date} night: campaign")
-                elif wd in (1, 4):  # Tue / Fri -> link post + LINE banner
-                    pattern = "C" if wd == 1 else "A"
-                    s = gen_link(api_key, pattern)
+                elif wd in (1, 4):  # Tue / Fri -> InfraGym promo + banner
+                    pattern = "game" if wd == 1 else "pain"
+                    s = gen_infragym(api_key, pattern)
                     open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
-                    subprocess.run(["cp", BANNER, npng], check=True)
-                    made.append(f"{date} night: link({pattern})")
+                    subprocess.run(["cp", INFRAGYM_BANNER, npng], check=True)
+                    made.append(f"{date} night: infragym({pattern})")
                 else:
                     s = gen_career(api_key)
                     open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
