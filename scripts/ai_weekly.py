@@ -27,6 +27,20 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LINE_URL = "https://x.gd/Et9Ri"
 BANNER = os.path.join(ROOT, "assets", "line_banner.png")
 
+# NESPE campaign: during this window the night slot becomes a campaign post
+# driving to the LP (replacing the usual career / LINE-CCNA nights).
+CAMPAIGN_END = datetime.date(2026, 8, 27)
+LP_URL = "https://lp.theit.co.jp/p/8bJgbvOT0crt?ftid=fnnF6ycboBC4"
+
+
+def wlen(text):
+    """X weighted length: JP/full-width = 2, ASCII = 1, each URL counts as 23."""
+    t = re.sub(r"https?://\S+", "x" * 23, text)
+    n = 0
+    for ch in t:
+        n += 1 if ord(ch) < 0x100 else 2
+    return n
+
 
 def anthropic(api_key, prompt, max_tokens=1500):
     body = {"model": MODEL, "max_tokens": max_tokens,
@@ -43,7 +57,9 @@ def anthropic(api_key, prompt, max_tokens=1500):
     m = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL) or re.search(r"(\{.*\})", text, re.DOTALL)
     if not m:
         raise ValueError("no JSON in output: " + text[:400])
-    return json.loads(m.group(1))
+    # strict=False tolerates raw newlines/tabs the model sometimes emits
+    # inside JSON string values (e.g. the multi-line "post" field).
+    return json.loads(m.group(1), strict=False)
 
 
 def used_terms():
@@ -115,6 +131,47 @@ def gen_link(api_key, pattern):
     return anthropic(api_key, prompt, max_tokens=800)
 
 
+CAMPAIGN_ANGLES = [
+    "IPAの制度改正で現行制度は2026年度で終了予定。『ネットワークスペシャリスト』という独立区分で受けられるのは今年が最後、という緊急性",
+    "独学で一番の遠回りは『何から・どの順で』の迷い。まず学習ロードマップで解消できる、という切り口",
+    "働きながらでも、実務経験が浅くても、正しい順番と教材があれば最短で狙える、という背中押し",
+    "本番の必修講義(R7年度版・必修講義版)を14日間そのまま無料で体験できる、というオファーの中身",
+    "積み上げたネットワークの知識を『国家資格』で証明すると、仕事や転職で活きる、という価値",
+    "2026年度の試験スケジュール(申込10/6〜、科目A 10/17〜、科目B 11/11〜)を示し、今からでも約2ヶ月ある、という現実的な後押し",
+    "『いつかネスペを』で止まっている人へ。まず14日間無料で、続けるかは後で決めればいい、というハードル下げ",
+]
+
+
+def gen_campaign(api_key, angle, extra=""):
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表)の夜の投稿を作ります。無料キャンペーンの告知を1つ。
+オファー: 国家資格「ネットワークスペシャリスト(ネスペ)」の合格講座eラーニング(R7年度版・必修講義版)を14日間無料開放+学習ロードマップ。提供は株式会社iT。現行のネスペ試験制度は2026年度で終了予定で、独立区分で受けられるのは今年が最後。誇大表現(絶対合格・誰でも等)は禁止。事実に基づき誠実に。
+今回の切り口: {angle}
+
+【本文の絶対条件】とても短くまとめる。構成は「①切り口の要点1文（40字以内）→ ②14日間無料を一言で（30字以内）→ 改行して {LP_URL} → ④短い一言CTA（例: プロフのリンクから今すぐ）」。長い説明・複数段落は禁止。日本語全角=2/半角=1・URL=23として、全体で必ず250単位以内に収める(超えたら短くやり直す)。ハッシュタグは付けても #ネスペ を1個だけ、無くてもよい。{extra}
+
+次のJSONだけを```json ... ```で出力:
+{{
+ "post": "上記条件を厳守した短い投稿本文。改行で {LP_URL} を必ず1回含める。",
+ "badge": "カード上部の短いバッジ。例: 期間限定・14日間無料",
+ "last": "見出し上の小さな一言。例: ＼ “ネスペ”として挑めるのは今年が最後 ／",
+ "headline": "カードの主見出し。<span class=\\"y\\">語句</span>でゴールド強調可。全角24字程度。",
+ "head_size": 54,  // 長い場合は 48
+ "points": ["特典・魅力を短く2〜3個。<b>語句</b>で強調可。例: ネスペ講座を14日間 無料"],
+ "cta_big": "本文のリンクから今すぐ無料で"
+}}"""
+    s = anthropic(api_key, prompt, max_tokens=1500)
+    # Length guard: X limit is 280 weighted; regenerate shorter if needed.
+    for _ in range(2):
+        if wlen(s.get("post", "")) <= 270:
+            break
+        s = anthropic(
+            api_key,
+            prompt + f"\n\n【再指示】前回の本文が長すぎました。{LP_URL} を除いた地の文を大幅に削り、全体を230単位以内に必ず収めてください。",
+            max_tokens=1500,
+        )
+    return s
+
+
 def main():
     api_key = os.environ["ANTHROPIC_API_KEY"]
     today = datetime.datetime.now(JST).date()
@@ -144,10 +201,32 @@ def main():
         # night
         ntxt = os.path.join(ROOT, "queue", f"{date}-night.txt")
         nposted = os.path.join(ROOT, "posted", f"{date}-night.txt")
-        if not os.path.exists(ntxt) and not os.path.exists(nposted):
+        npng = os.path.join(ROOT, "queue", f"{date}-night.png")
+        campaign = d <= CAMPAIGN_END
+
+        # During the campaign window the night slot is a NESPE campaign post.
+        # If an existing (non-campaign) night is queued, replace it. If tonight
+        # is already posted, leave it. Outside the window, only fill gaps.
+        already_campaign = os.path.exists(ntxt) and LP_URL[:22] in open(ntxt, encoding="utf-8").read()
+        do_night = (
+            not os.path.exists(nposted)
+            and (
+                (campaign and not already_campaign)
+                or (not campaign and not os.path.exists(ntxt))
+            )
+        )
+        if do_night:
             try:
-                npng = os.path.join(ROOT, "queue", f"{date}-night.png")
-                if wd in (1, 4):  # Tue / Fri -> link post + LINE banner
+                if campaign:
+                    angle = CAMPAIGN_ANGLES[i % len(CAMPAIGN_ANGLES)]
+                    s = gen_campaign(api_key, angle)
+                    open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
+                    render("make_campaign_card.py",
+                           {k: s[k] for k in ("badge", "last", "headline", "points", "cta_big") if k in s}
+                           | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
+                           npng)
+                    made.append(f"{date} night: campaign")
+                elif wd in (1, 4):  # Tue / Fri -> link post + LINE banner
                     pattern = "C" if wd == 1 else "A"
                     s = gen_link(api_key, pattern)
                     open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
