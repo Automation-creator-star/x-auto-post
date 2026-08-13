@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    width:1080px; height:1350px;
+    font-family:"Noto Sans CJK JP", sans-serif;
+    background:radial-gradient(130% 80% at 50% -10%, #6D28D9 0%, #4F46E5 45%, #3730A3 100%);
+    color:#fff; position:relative; overflow:hidden;
+  }
+  .blob { position:absolute; border-radius:50%; filter:blur(2px); }
+  .b1 { width:520px; height:520px; top:-160px; right:-150px;
+        background:radial-gradient(circle, rgba(20,184,166,.35), transparent 70%); }
+  .b2 { width:460px; height:460px; bottom:-180px; left:-140px;
+        background:radial-gradient(circle, rgba(245,179,1,.22), transparent 70%); }
+  .wrap { position:relative; padding:74px 68px 60px; height:100%; display:flex; flex-direction:column; }
+  .top { display:flex; align-items:center; gap:18px; }
+  .logo { font-size:56px; font-weight:900; letter-spacing:-1px; }
+  .logo .g { color:#5EEAD4; }
+  .pill { font-size:26px; font-weight:800; background:rgba(255,255,255,.16);
+          border:1px solid rgba(255,255,255,.35); padding:8px 20px; border-radius:999px; letter-spacing:1px; }
+  .free { margin-left:auto; display:flex; align-items:center; gap:10px;
+          background:linear-gradient(180deg,#FFC629,#F5B301); color:#3a2a00;
+          font-weight:900; font-size:30px; padding:12px 26px; border-radius:999px; box-shadow:0 8px 22px rgba(245,179,1,.35); }
+  .head { margin-top:52px; font-size:60px; font-weight:900; line-height:1.32; letter-spacing:0; }
+  .head .u { color:#5EEAD4; border-bottom:7px solid rgba(94,234,212,.45); padding-bottom:4px; }
+  .sub { margin-top:26px; font-size:34px; font-weight:700; line-height:1.5; color:#E4E2FB; }
+  .sub b { color:#FBBF24; }
+  .chips { margin-top:46px; display:flex; flex-wrap:wrap; gap:18px; }
+  .chip { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.12);
+          border:1px solid rgba(255,255,255,.22); border-radius:18px; padding:20px 26px; font-size:33px; font-weight:800; }
+  .chip .ico { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+               font-size:30px; font-weight:900; }
+  .i-teal { background:#14B8A6; } .i-gold { background:#F5B301; color:#3a2a00; } .i-pink { background:#EC4899; } .i-blue { background:#38BDF8; color:#062033; }
+  .proof { margin-top:38px; font-size:30px; font-weight:800; color:#C7F9EF; display:flex; align-items:center; gap:14px; }
+  .proof .star { color:#FBBF24; }
+  .spacer { flex:1; }
+  .cta { background:rgba(255,255,255,.97); color:#4F46E5; border-radius:22px; padding:30px; text-align:center;
+         box-shadow:0 16px 40px rgba(0,0,0,.28); }
+  .cta .big { font-size:50px; font-weight:900; letter-spacing:.5px; }
+  .cta .big .arrow { color:#14B8A6; }
+  .cta .sm { font-size:29px; font-weight:700; color:#6D28D9; margin-top:8px; }
+  .footer { margin-top:30px; display:flex; justify-content:space-between; align-items:center;
+            border-top:2px solid rgba(255,255,255,.25); padding-top:22px; }
+  .brand { font-size:31px; font-weight:800; color:#fff; }
+  .brand span { color:#FBBF24; }
+  .prov { font-size:26px; color:#C9C6F0; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">Infra<span class="g">Gym</span></div>
+      <div class="pill">CCNA 200-301</div>
+      <div class="free">🔥 完全無料</div>
+    </div>
+
+    <div class="head">ネットワークの勉強が、<br><span class="u">ゲームみたいにサクサク進む。</span></div>
+    <div class="sub">参考書だけで心が折れそうな人へ。<br><b>手を動かして</b>攻略する無料トレーニングアプリ。</div>
+
+    <div class="chips">
+      <div class="chip"><span class="ico i-gold">⏱</span>1日5分でOK</div>
+      <div class="chip"><span class="ico i-teal">Lv</span>レベル＆称号でゲーム感覚</div>
+      <div class="chip"><span class="ico i-blue">?</span>図解＋クイズで丸暗記卒業</div>
+      <div class="chip"><span class="ico i-pink">✦</span>CCNA全1091問・模試つき</div>
+    </div>
+
+    <div class="proof"><span class="star">★</span>延べ1,000名を合格へ導いた現役講師が監修</div>
+
+    <div class="spacer"></div>
+
+    <div class="cta">
+      <div class="big">今すぐ無料で始める <span class="arrow">→</span></div>
+      <div class="sm">登録なしですぐプレイ／スマホだけで完結</div>
+    </div>
+    <div class="footer">
+      <div class="brand">ネスペ社長 <span>@nespe_shacho</span></div>
+      <div class="prov">提供: 株式会社iT</div>
+    </div>
+  </div>
+</body>
+</html>
