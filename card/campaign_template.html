@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1350px;
+    font-family: "Noto Sans CJK JP", sans-serif;
+    background: radial-gradient(120% 90% at 50% 0%, #173458 0%, #0E2340 65%);
+    color: #ffffff; position: relative; overflow: hidden;
+  }
+  .glow { position: absolute; width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(245,179,1,0.16), transparent 70%);
+    top: -220px; right: -180px; }
+  .content { position: relative; padding: 84px 70px 64px; height: 100%; display: flex; flex-direction: column; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 14px;
+    background: linear-gradient(180deg,#FFC629,#F5B301); color: #3a2a00;
+    font-weight: 900; font-size: 34px; padding: 14px 34px; border-radius: 999px;
+    letter-spacing: 2px; width: fit-content; box-shadow: 0 8px 22px rgba(245,179,1,.3);
+  }
+  .badge .dot { width: 16px; height: 16px; border-radius: 50%; background: #D8443A; box-shadow: 0 0 0 5px rgba(216,68,58,.3); }
+  .last {
+    margin-top: 44px; font-size: 40px; font-weight: 800; color: #CFE0F5; letter-spacing: 2px;
+  }
+  .headline {
+    margin-top: 12px; font-size: __HEAD_SIZE__px; font-weight: 900; line-height: 1.32; letter-spacing: 1px;
+  }
+  .headline .y { color: #F5B301; }
+  .points { margin-top: 46px; display: flex; flex-direction: column; gap: 22px; }
+  .pt { display: flex; align-items: flex-start; gap: 20px; font-size: 38px; font-weight: 700; line-height: 1.4; color: #eaf2fb; }
+  .pt .ck { flex: 0 0 46px; height: 46px; border-radius: 50%; background: #00A6A6; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; margin-top: 4px; }
+  .pt b { color: #7fe3e3; }
+  .spacer { flex: 1; }
+  .cta {
+    background: rgba(0,0,0,.25); border: 2px solid rgba(245,179,1,.5); border-radius: 18px;
+    padding: 26px 30px; text-align: center;
+  }
+  .cta .big { font-size: 44px; font-weight: 900; color: #F5B301; }
+  .cta .sm { font-size: 30px; font-weight: 700; color: #CFE0F5; margin-top: 8px; }
+  .footer {
+    margin-top: 30px; display: flex; justify-content: space-between; align-items: center;
+    border-top: 2px solid rgba(207,224,245,.3); padding-top: 22px;
+  }
+  .brand { font-size: 32px; font-weight: 700; color: #e2e8f0; }
+  .brand span { color: #F5B301; }
+  .prov { font-size: 26px; color: #9fb3c9; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="content">
+    <div class="badge"><span class="dot"></span>__BADGE__</div>
+    <div class="last">__LAST__</div>
+    <div class="headline">__HEADLINE__</div>
+    <div class="points">__POINTS__</div>
+    <div class="spacer"></div>
+    <div class="cta">
+      <div class="big">__CTA_BIG__</div>
+      __CTA_SM_BLOCK__
+    </div>
+    <div class="footer">
+      <div class="brand">ネスペ社長 <span>@nespe_shacho</span></div>
+      <div class="prov">提供: 株式会社iT</div>
+    </div>
+  </div>
+</body>
+</html>
