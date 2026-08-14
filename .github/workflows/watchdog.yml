@@ -3,9 +3,12 @@ name: Posting Watchdog
 on:
   # Reliable trigger: a CCR task dispatches this near the end of each posting
   # window. The schedule below is only a backup (GitHub cron is unreliable).
+    # Independent backup scheduler (CCR fires the same watchdog on its own
+    # schedule). Runs mid + late in every window so a single skipped fire on
+    # either scheduler never loses a slot. JST: 9:50 / 11:50 / 12:50 / 16:50 /
+    # 21:50 / 22:50 / 23:50 = UTC 0:50 / 2:50 / 3:50 / 7:50 / 12:50 / 13:50 / 14:50.
   schedule:
-    # JST 11:40 / 17:40 / 23:40 = UTC 02:40 / 08:40 / 14:40 (end of each window)
-    - cron: '40 2,8,14 * * *'
+    - cron: '50 0,2,3,7,12,13,14 * * *'
   workflow_dispatch:
     inputs:
       force_slot:
