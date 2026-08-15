@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Google Chrome</span>ゼロデイ脆弱性で緊急更新",
+  "chips": [
+    "CVE-2026-8228",
+    "重大度High",
+    "悪用確認済"
+  ],
+  "body": "パッチ公開前から攻撃に使われるゼロデイ脆弱性が発見され、Googleが緊急アップデートを配信。即時更新が推奨されています。",
+  "source": "(出典: BleepingComputer/The Hacker News)"
+}
