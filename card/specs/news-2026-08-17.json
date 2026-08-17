@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Google Cloud</span>で大規模障害発生",
+  "chips": [
+    "8/15-16",
+    "Compute Engine",
+    "ネットワーク設定"
+  ],
+  "body": "設定変更が原因で複数サービスに影響。冗長化設計の重要性を再認識。",
+  "source": "(出典: Google Cloud status)"
+}
