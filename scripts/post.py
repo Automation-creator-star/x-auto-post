@@ -33,6 +33,8 @@ def current_slot(now):
         return "morning"
     if 12 <= h <= 17:
         return "noon"
+    if 18 <= h <= 20:
+        return "evening"
     if 21 <= h <= 23:
         return "night"
     return None
