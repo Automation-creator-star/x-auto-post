@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Google Cloud</span>で大規模障害",
+  "chips": [
+    "8/16発生",
+    "複数リージョン",
+    "ネットワーク構成"
+  ],
+  "body": "Compute EngineやCloud SQLなどが影響。ネットワーク構成変更の不具合が原因。",
+  "source": "(出典: Google Cloud)"
+}
