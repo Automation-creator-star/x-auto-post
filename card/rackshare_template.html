@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    width:1080px; height:1350px;
+    font-family:"Noto Sans CJK JP", sans-serif;
+    background:radial-gradient(125% 85% at 50% -5%, #12408B 0%, #0B2545 60%, #071B37 100%);
+    color:#fff; position:relative; overflow:hidden;
+  }
+  .grid { position:absolute; inset:0;
+    background-image:linear-gradient(rgba(56,189,248,.06) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(56,189,248,.06) 1px, transparent 1px);
+    background-size:60px 60px; }
+  .glow { position:absolute; width:640px; height:640px; border-radius:50%;
+    background:radial-gradient(circle, rgba(56,189,248,.20), transparent 70%); top:-200px; right:-160px; }
+  .wrap { position:relative; padding:78px 70px 60px; height:100%; display:flex; flex-direction:column; }
+  .top { display:flex; align-items:center; gap:18px; }
+  .logo { font-size:52px; font-weight:900; letter-spacing:-1px; }
+  .logo .r { color:#38BDF8; }
+  .tagline { font-size:26px; font-weight:700; color:#9FC4E8; margin-left:2px; }
+  .badge { margin-left:auto; background:rgba(56,189,248,.16); border:1px solid rgba(56,189,248,.5);
+    color:#BFE6FF; font-weight:800; font-size:26px; padding:10px 22px; border-radius:999px; letter-spacing:1px; }
+  .headline { margin-top:56px; font-size:__HEAD_SIZE__px; font-weight:900; line-height:1.34; letter-spacing:.5px; }
+  .headline .y { color:#F5B301; }
+  .headline .c { color:#38BDF8; }
+  .points { margin-top:48px; display:flex; flex-direction:column; gap:24px; }
+  .pt { display:flex; align-items:flex-start; gap:20px; font-size:37px; font-weight:700; line-height:1.4; color:#E8F2FC; }
+  .pt .ck { flex:0 0 48px; height:48px; border-radius:12px; background:#1D63C9; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:900; margin-top:3px; }
+  .pt b { color:#7fd0ff; }
+  .spacer { flex:1; }
+  .use { display:flex; gap:16px; margin-top:40px; }
+  .use .u { flex:1; text-align:center; background:rgba(255,255,255,.07); border:1px solid rgba(159,196,232,.25);
+    border-radius:16px; padding:22px 8px; font-size:34px; font-weight:800; color:#DCEBFA; }
+  .use .u span { display:block; font-size:24px; font-weight:700; color:#7ea9d4; margin-top:4px; }
+  .cta { margin-top:34px; background:linear-gradient(180deg,#2C7BE5,#1D63C9); border-radius:20px;
+    padding:28px; text-align:center; box-shadow:0 14px 34px rgba(29,99,201,.4); }
+  .cta .big { font-size:46px; font-weight:900; }
+  .cta .big .arrow { color:#BFE6FF; }
+  .footer { margin-top:28px; display:flex; justify-content:space-between; align-items:center;
+    border-top:2px solid rgba(159,196,232,.25); padding-top:20px; }
+  .brand { font-size:30px; font-weight:800; color:#fff; }
+  .brand span { color:#38BDF8; }
+  .prov { font-size:25px; color:#8fabc9; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">Rack<span class="r">Share</span></div>
+      <div class="tagline">ラックを、シェアしよう</div>
+      <div class="badge">__BADGE__</div>
+    </div>
+
+    <div class="headline">__HEADLINE__</div>
+
+    <div class="points">__POINTS__</div>
+
+    <div class="spacer"></div>
+
+    <div class="use">
+      <div class="u">読む<span>探して解決</span></div>
+      <div class="u">質問する<span>現場の疑問</span></div>
+      <div class="u">書く<span>実績を残す</span></div>
+    </div>
+
+    <div class="cta">
+      <div class="big">__CTA_BIG__ <span class="arrow">→</span></div>
+    </div>
+    <div class="footer">
+      <div class="brand">ネスペ社長 <span>@nespe_shacho</span></div>
+      <div class="prov">運営: 株式会社iT</div>
+    </div>
+  </div>
+</body>
+</html>
