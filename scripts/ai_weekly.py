@@ -28,6 +28,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INFRAGYM_URL = "https://lp.theit.co.jp/p/DbzLM6ruxTc8?ftid=G9bN143EI7nd"
 INFRAGYM_BANNER = os.path.join(ROOT, "assets", "infragym_banner.png")
 
+# Evening (18:00) = daily RackShare promo (infra-engineer knowledge-sharing site).
+RACKSHARE_URL = "https://rackshare.jp/"
+
 # NESPE campaign: during this window the night slot becomes a campaign post
 # driving to the LP (replacing the usual career / LINE-CCNA nights).
 CAMPAIGN_END = datetime.date(2026, 8, 27)
@@ -189,6 +192,46 @@ def gen_campaign(api_key, angle, extra=""):
     return s
 
 
+RACKSHARE_ANGLES = [
+    "インフラの仕事は外から見えにくく、止めなければ何もしていないように見える。成果物は顧客環境に紐づいて社外に出せず、実力を示す材料が資格名と経験年数しかない——だからこそ書いて残せば実績になる、という切り口",
+    "現場で解決した知識が社内チャットや個人の頭の中に埋もれ、同じ問題を別の誰かがまた一から調べている。共有すれば誰かの調査時間を短くできる、という切り口",
+    "個人ブログより見つけてもらいやすく、書いた記事がそのままポートフォリオになる。転職や案件で『資格では見えない実力』を示せる、という切り口",
+    "障害対応・設定・検証結果のナレッジを残すと、知識が整理され自分の技術資産になる。得意分野でブランディングもできる、という切り口",
+    "使い方は『読む・質問する・書く』の3つ。まずは読む・質問するだけでもいい。現場の疑問を解決する場所として使ってみて、という切り口",
+    "『インフラのことなら、ここに行けばいい』——日本のインフラエンジニアが集まる場所を目指している。まだ最初のバージョンで、利用者の声を聞きながら育てている段階、という切り口",
+]
+
+
+def gen_rackshare(api_key, angle):
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア)の夕方の投稿を作ります。
+インフラエンジニア向けの知識共有サイト「RackShare(ラックシェア)」への誘導投稿を1つ。
+サイトの事実: 現場で得た知識を共有し、自分の実績として残せる場所。QiitaとYahoo!知恵袋のインフラエンジニア版。使い方は「読む・質問する・書く」の3つ。障害対応・設定・検証結果などのナレッジを投稿できる。無料ではじめられる。運営は株式会社iT。書けば知識が整理され技術資産になり、資格では見えない実力を示せてポートフォリオにもなる。誇大表現は禁止、事実ベースで誠実に。
+文体: です・ます調(敬語)。一人称は「私」、読者は「あなた」。断定は弱めない。
+今回の切り口: {angle}
+
+【本文の絶対条件】短くまとめる。構成は「①切り口の要点を1〜2文(合計70字以内)→ 改行して {RACKSHARE_URL} → ③短い一言CTA(例: 無料ではじめられます)」。長い説明・3段落以上は禁止。日本語全角=2/半角=1・URL=23として、全体で必ず240単位以内に収める(超えたら短くやり直す)。ハッシュタグは付けても #インフラエンジニア を1個だけ、無くてもよい。
+
+次のJSONだけを```json ... ```で出力:
+{{
+ "post": "上記条件を厳守した短い投稿本文。改行で {RACKSHARE_URL} を必ず1回含める。",
+ "badge": "カード右上の短いバッジ。例: インフラの知識共有",
+ "headline": "カードの主見出し。<span class=\\"c\\">語句</span>で水色、<span class=\\"y\\">語句</span>でゴールド強調可。全角22字程度。",
+ "head_size": 54,
+ "points": ["魅力を短く2〜3個。<b>語句</b>で強調可。例: 書けば<b>技術資産</b>になる"],
+ "cta_big": "無料ではじめる"
+}}"""
+    s = anthropic(api_key, prompt, max_tokens=1200)
+    for _ in range(2):
+        if wlen(s.get("post", "")) <= 270:
+            break
+        s = anthropic(
+            api_key,
+            prompt + f"\n\n【再指示】前回が長すぎました。{RACKSHARE_URL} を除いた地の文を削り、全体を250単位以内に必ず収めてください。",
+            max_tokens=1200,
+        )
+    return s
+
+
 def main():
     api_key = os.environ["ANTHROPIC_API_KEY"]
     today = datetime.datetime.now(JST).date()
@@ -259,6 +302,23 @@ def main():
                     made.append(f"{date} night: career")
             except Exception as e:  # noqa: BLE001
                 print(f"[warn] {date} night failed: {e}", file=sys.stderr)
+
+        # evening (18:00) -> daily RackShare promo + card
+        etxt = os.path.join(ROOT, "queue", f"{date}-evening.txt")
+        eposted = os.path.join(ROOT, "posted", f"{date}-evening.txt")
+        epng = os.path.join(ROOT, "queue", f"{date}-evening.png")
+        if not os.path.exists(etxt) and not os.path.exists(eposted):
+            try:
+                angle = RACKSHARE_ANGLES[i % len(RACKSHARE_ANGLES)]
+                s = gen_rackshare(api_key, angle)
+                open(etxt, "w", encoding="utf-8").write(s["post"].strip())
+                render("make_rackshare_card.py",
+                       {k: s[k] for k in ("badge", "headline", "points", "cta_big") if k in s}
+                       | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
+                       epng)
+                made.append(f"{date} evening: rackshare")
+            except Exception as e:  # noqa: BLE001
+                print(f"[warn] {date} evening failed: {e}", file=sys.stderr)
 
     print("Generated:\n" + ("\n".join(made) if made else "(nothing — all 7 days already filled)"))
 
