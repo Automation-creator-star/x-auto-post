@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Google Cloud</span>で大規模障害発生",
+  "chips": [
+    "YouTube影響",
+    "ネットワーク問題",
+    "8/18夜"
+  ],
+  "body": "複数サービスに影響。マルチリージョン構成の重要性を示す事例として学びになります。",
+  "source": "(出典: Google Cloud)"
+}
