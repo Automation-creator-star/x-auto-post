@@ -43,6 +43,29 @@ PROMPT = """あなたはX(Twitter)アカウント「ネスペ社長」(@nespe_sh
 確実なニュースが無い・裏取りできない場合は {"found": false} だけを出力する(誤情報を出すより安全)。"""
 
 
+def wlen(text):
+    """X weighted length: JP/full-width=2, ASCII=1, each URL counts as 23."""
+    t = re.sub(r"https?://\\S+", "x" * 23, text)
+    return sum(1 if ord(c) < 0x100 else 2 for c in t)
+
+
+def shorten(api_key, post):
+    """Ask the model to shorten an over-long post, keeping facts + (出典:...)."""
+    prompt = ("次のXポスト本文を、意味・事実・『(出典: …)』を保ったまま短くしてください。"
+              "日本語全角=2/半角=1で数えて250以内。冒頭の【ITニュース】は残す。"
+              "余計な説明やクォートは付けず、短くした本文だけを出力:\n\n" + post)
+    body = {"model": MODEL, "max_tokens": 1000,
+            "messages": [{"role": "user", "content": prompt}]}
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=json.dumps(body).encode(),
+        headers={"x-api-key": api_key, "anthropic-version": "2023-06-01",
+                 "content-type": "application/json"}, method="POST")
+    with urllib.request.urlopen(req, timeout=120) as r:
+        data = json.load(r)
+    return "".join(b.get("text", "") for b in data.get("content", []) if b.get("type") == "text").strip()
+
+
 def call_anthropic(api_key):
     body = {
         "model": MODEL,
@@ -93,6 +116,14 @@ def main():
         return
 
     post = spec["post_text"].strip()
+    for _ in range(3):
+        if wlen(post) <= 270:
+            break
+        try:
+            post = shorten(api_key, post).strip()
+        except Exception as e:  # noqa: BLE001
+            print(f"[warn] shorten failed: {e}", file=sys.stderr)
+            break
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write(post)
 
