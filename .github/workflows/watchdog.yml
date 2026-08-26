@@ -1,18 +1,16 @@
 name: Posting Watchdog
 
 on:
-  # Reliable trigger: a CCR task dispatches this near the end of each posting
-  # window. The schedule below is only a backup (GitHub cron is unreliable).
-    # Independent backup scheduler (CCR fires the same watchdog on its own
-    # schedule). Runs mid + late in every window so a single skipped fire on
-    # either scheduler never loses a slot. JST: 9:50 / 11:50 / 12:50 / 16:50 /
-    # 21:50 / 22:50 / 23:50 = UTC 0:50 / 2:50 / 3:50 / 7:50 / 12:50 / 13:50 / 14:50.
+  # Backup scheduler (a CCR task also dispatches this). Runs at each window's
+  # end. The job below does a CHEAP pre-check first and only installs Chromium /
+  # generates when a slot is actually missing, so normal runs cost ~20s.
   schedule:
-    - cron: '50 0,2,3,7,10,11,12,13,14 * * *'
+    # JST 11:40 / 17:40 / 20:40 / 23:40 = UTC 02:40 / 08:40 / 11:40 / 14:40
+    - cron: '40 2,8,11,14 * * *'
   workflow_dispatch:
     inputs:
       force_slot:
-        description: 'morning | noon | night (blank = auto by JST time)'
+        description: 'morning | noon | evening | night (blank = auto by JST time)'
         required: false
 
 permissions:
@@ -32,13 +30,40 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Cheap gate: is the current slot already posted? If so, skip everything.
+      - name: Pre-check
+        id: chk
+        env:
+          FORCE_SLOT: ${{ github.event.inputs.force_slot }}
+        run: |
+          python - <<'PY'
+          import os, datetime
+          JST = datetime.timezone(datetime.timedelta(hours=9))
+          now = datetime.datetime.now(JST); h = now.hour
+          def slot(h):
+              if 8 <= h <= 11: return "morning"
+              if 12 <= h <= 17: return "noon"
+              if 18 <= h <= 20: return "evening"
+              if 21 <= h <= 23: return "night"
+              return ""
+          s = os.environ.get("FORCE_SLOT") or slot(h)
+          need = "0"
+          if s and not os.path.exists(f"posted/{now:%Y-%m-%d}-{s}.txt"):
+              need = "1"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"need={need}\n")
+          print(f"slot={s} need={need}")
+          PY
+
       - name: Install dependencies
+        if: steps.chk.outputs.need == '1'
         run: |
           pip install tweepy playwright
           python -m playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
 
       - name: Run watchdog (self-heal + alert)
+        if: steps.chk.outputs.need == '1'
         env:
           FORCE_SLOT: ${{ github.event.inputs.force_slot }}
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
@@ -51,6 +76,7 @@ jobs:
         run: python scripts/watchdog.py
 
       - name: Commit any generated/posted changes
+        if: steps.chk.outputs.need == '1'
         run: |
           git config user.name "watchdog bot"
           git config user.email "watchdog@users.noreply.github.com"
