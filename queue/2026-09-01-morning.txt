@@ -1,0 +1,7 @@
+【用語解説】DTPとは
+
+Dynamic Trunking Protocolの略で、スイッチポート間でトランクリンクの確立を自動的に交渉するCisco独自のプロトコルです。
+
+Dynamic Auto、Dynamic Desirable、Trunk、Accessの4つのモードがあり、相手ポートとの組み合わせでトランクになるかアクセスポートになるかが決まります。便利な反面、セキュリティリスクもあるため本番環境では無効化が推奨されます。
+
+#CCNA
