@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome緊急更新</span>ゼロデイ脆弱性を修正",
+  "chips": [
+    "CVE-2026-8800",
+    "Critical",
+    "実攻撃を確認"
+  ],
+  "body": "V8エンジンのUse-After-Free脆弱性が実際に悪用中。即座のアップデートが必要です。",
+  "source": "(出典: Google公式ブログ)"
+}
