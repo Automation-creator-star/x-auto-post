@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome緊急更新</span>ゼロデイ脆弱性を悪用確認",
+  "chips": [
+    "CVE-2024-7971",
+    "実攻撃で悪用",
+    "即時更新推奨"
+  ],
+  "body": "Type Confusionの脆弱性が実際の攻撃で使われており、Googleが緊急パッチを公開。ブラウザ再起動で更新を反映させることが重要です。",
+  "source": "(出典: Google/各報道)"
+}
