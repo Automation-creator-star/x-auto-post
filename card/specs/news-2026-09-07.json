@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome緊急更新</span>でV8脆弱性修正",
+  "chips": [
+    "CVE-2024-7965",
+    "V8エンジン",
+    "ヒープ破損"
+  ],
+  "body": "JavaScriptエンジンV8の不適切な実装により任意コード実行の恐れ。細工されたHTMLで悪用可能なため即時更新推奨。",
+  "source": "(出典: Google/各報道)"
+}
