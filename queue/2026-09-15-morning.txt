@@ -1,0 +1,9 @@
+【用語解説】PVST+とは
+
+Per-VLAN Spanning Tree Plusの略で、VLAN毎に独立したSTPインスタンスを動作させるCisco独自の拡張技術です。
+
+通常のSTPは全VLANで1つのツリーですが、PVST+ではVLAN毎に異なるルートブリッジを設定可能。これにより複数リンクを有効活用した負荷分散が実現できます。
+
+CCNA試験ではCisco機器のデフォルト動作として頻出です！
+
+#CCNA
