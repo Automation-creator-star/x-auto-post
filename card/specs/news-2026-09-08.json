@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Android</span>に重大な脆弱性、9月更新公開",
+  "chips": [
+    "47件の脆弱性",
+    "Critical級含む",
+    "RCE可能性"
+  ],
+  "body": "Googleが9月のセキュリティパッチを公開。リモートコード実行など重大な脆弱性を修正しました。",
+  "source": "(出典: Google)"
+}
