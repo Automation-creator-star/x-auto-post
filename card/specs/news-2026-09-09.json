@@ -1,0 +1,10 @@
+{
+  "headline": "Google <span class=\"hi\">Trillium</span> TPU発表",
+  "chips": [
+    "性能4.7倍",
+    "効率67%↑",
+    "第6世代"
+  ],
+  "body": "独自AIチップで前世代比4.7倍の性能と67%の省電力化を達成。専用ハードウェア設計がクラウド競争の鍵に。",
+  "source": "(出典: Google Cloud公式)"
+}
