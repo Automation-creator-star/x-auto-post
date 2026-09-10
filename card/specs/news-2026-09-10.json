@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome緊急更新</span>ゼロデイ脆弱性に対応",
+  "chips": [
+    "CVE-2024-7971",
+    "悪用確認済",
+    "要即時更新"
+  ],
+  "body": "type confusionの脆弱性で任意コード実行の恐れ。全ユーザーは直ちに最新版へのアップデートが必要です。",
+  "source": "(出典: Google)"
+}
