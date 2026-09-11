@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Android重大脆弱性</span>悪用を確認",
+  "chips": [
+    "権限昇格",
+    "既に悪用",
+    "広範な端末"
+  ],
+  "body": "細工されたアプリ経由で権限昇格が可能。Googleが修正パッチを公開し早期適用を推奨。",
+  "source": "(出典: Google)"
+}
