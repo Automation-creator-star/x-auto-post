@@ -31,6 +31,19 @@ INFRAGYM_BANNER = os.path.join(ROOT, "assets", "infragym_banner.png")
 # Evening (18:00) = daily RackShare promo (infra-engineer knowledge-sharing site).
 RACKSHARE_URL = "https://rackshare.jp/"
 
+# Mon/Thu night = CCNP problem-set book promo on Amazon (text only, no card).
+CCNP_BOOKS = {
+    "encor": {"exam": "CCNP ENCOR 350-401", "url": "https://www.amazon.co.jp/dp/B0HHD6HK1R", "tags": "#CCNP #ENCOR #Cisco"},
+    "enarsi": {"exam": "CCNP ENARSI 300-410", "url": "https://www.amazon.co.jp/dp/B0HHDW4FYS", "tags": "#CCNP #ENARSI #Cisco"},
+}
+CCNP_ANGLES = [
+    "『参考書は読んだが、本番レベルの問題演習が足りない』という悩みに、問題を解いて知識を定着させる切り口",
+    "『知識は覚えたのに、問題になると迷う』という悩みに、状況を読んで適切な答えを選ぶ力を鍛える切り口",
+    "試験直前の総仕上げ・弱点チェックとして、抜け漏れを問題演習で洗い出す切り口",
+    "CCNPは読むだけでなく、実際に解いて『判断できる状態』にすることが合格の分かれ目、という切り口",
+    "独学で手が止まりがちな人へ。まず1問ずつ解きながら理解を確認していけばいい、という背中押しの切り口",
+]
+
 # NESPE campaign: during this window the night slot becomes a campaign post
 # driving to the LP (replacing the usual career / LINE-CCNA nights).
 CAMPAIGN_END = datetime.date(2026, 8, 27)
@@ -232,6 +245,26 @@ def gen_rackshare(api_key, angle):
     return s
 
 
+def gen_ccnp(api_key, which, angle):
+    b = CCNP_BOOKS[which]
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア)の夜の投稿を作ります。
+Amazonで公開している「{b['exam']}対策の問題集」への誘導投稿を1つ。
+本の位置づけ: 参考書だけでは足りない本番レベルの問題演習を補い、解きながら知識を定着させ、試験直前の弱点チェックにも使える問題集。CCNPは読むだけでなく実際に解いて『判断できる状態』にすることが重要。誇大表現(絶対合格・簡単に等)は禁止、事実ベースで誠実に。
+文体: です・ます調。一人称は「私」、読者は「あなた」。
+今回の切り口: {angle}
+
+【本文の絶対条件】冒頭は 📘 で始め、{b['exam']} を勉強中の人への呼びかけにする。構成は「①呼びかけ＋悩み1〜2文 → ②問題集の紹介1文(解いて定着/弱点チェック) → 改行して {b['url']} → ③ハッシュタグ {b['tags']}」。長い箇条書きや複数段落は避け簡潔に。日本語全角=2/半角=1・URLは23として、全体で必ず265単位以内に収める(超えたら短くやり直す)。
+
+次のJSONだけを```json ... ```で出力:
+{{"post": "上記条件を厳守した投稿本文。改行で {b['url']} を必ず1回含め、末尾は {b['tags']} で終える。"}}"""
+    s = anthropic(api_key, prompt, max_tokens=1000)
+    for _ in range(2):
+        if wlen(s.get("post", "")) <= 270:
+            break
+        s = anthropic(api_key, prompt + f"\n\n【再指示】前回が長すぎました。{b['url']} と {b['tags']} を除いた地の文を削り、全体を250単位以内に必ず収めてください。", max_tokens=1000)
+    return s
+
+
 def main():
     api_key = os.environ["ANTHROPIC_API_KEY"]
     today = datetime.datetime.now(JST).date()
@@ -264,15 +297,25 @@ def main():
         npng = os.path.join(ROOT, "queue", f"{date}-night.png")
         campaign = d <= CAMPAIGN_END
 
-        # During the campaign window the night slot is a NESPE campaign post.
-        # If an existing (non-campaign) night is queued, replace it. If tonight
-        # is already posted, leave it. Outside the window, only fill gaps.
+        # Night slot by weekday (outside the NESPE campaign window):
+        #   Mon -> CCNP ENCOR book, Thu -> CCNP ENARSI book (text only),
+        #   Tue/Fri -> InfraGym, else -> career.
+        # Campaign (if active) overrides all. CCNP days replace an existing
+        # non-CCNP night so the schedule change applies to already-queued days;
+        # other days only fill gaps.
+        ccnp_which = "encor" if wd == 0 else ("enarsi" if wd == 3 else None)
         already_campaign = os.path.exists(ntxt) and LP_URL[:22] in open(ntxt, encoding="utf-8").read()
+        already_ccnp = (
+            ccnp_which is not None
+            and os.path.exists(ntxt)
+            and CCNP_BOOKS[ccnp_which]["url"] in open(ntxt, encoding="utf-8").read()
+        )
         do_night = (
             not os.path.exists(nposted)
             and (
                 (campaign and not already_campaign)
-                or (not campaign and not os.path.exists(ntxt))
+                or (not campaign and ccnp_which is not None and not already_ccnp)
+                or (not campaign and ccnp_which is None and not os.path.exists(ntxt))
             )
         )
         if do_night:
@@ -286,6 +329,13 @@ def main():
                            | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
                            npng)
                     made.append(f"{date} night: campaign")
+                elif ccnp_which is not None:  # Mon/Thu -> CCNP book (text only)
+                    angle = CCNP_ANGLES[d.isocalendar()[1] % len(CCNP_ANGLES)]
+                    s = gen_ccnp(api_key, ccnp_which, angle)
+                    open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
+                    if os.path.exists(npng):  # ensure text-only (drop any stale card)
+                        os.remove(npng)
+                    made.append(f"{date} night: ccnp({ccnp_which})")
                 elif wd in (1, 4):  # Tue / Fri -> InfraGym promo + banner
                     pattern = "game" if wd == 1 else "pain"
                     s = gen_infragym(api_key, pattern)
