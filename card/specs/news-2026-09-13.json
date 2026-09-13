@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">OpenAI o1</span>発表 思考型AI",
+  "chips": [
+    "推論特化",
+    "API提供開始",
+    "GPT-4o超え"
+  ],
+  "body": "回答前に思考プロセスを経る新モデル。数学・コーディングで大幅性能向上し、API提供も開始。",
+  "source": "(出典: OpenAI公式ブログ)"
+}
