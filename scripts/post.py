@@ -31,8 +31,10 @@ def current_slot(now):
     # lands in the right slot. Each slot's queue file is posted once, then moved.
     if 8 <= h <= 11:
         return "morning"
-    if 12 <= h <= 17:
+    if 12 <= h <= 14:
         return "noon"
+    if 15 <= h <= 17:
+        return "afternoon"
     if 18 <= h <= 20:
         return "evening"
     if 21 <= h <= 23:
