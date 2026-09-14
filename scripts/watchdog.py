@@ -25,15 +25,17 @@ import urllib.request
 JST = datetime.timezone(datetime.timedelta(hours=9))
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SLOT_JP = {"morning": "朝(用語解説)", "noon": "昼(ITニュース)",
-           "evening": "夕方(RackShare)", "night": "夜"}
+           "afternoon": "15時(whoami年収診断)", "evening": "夕方(RackShare)", "night": "夜"}
 
 
 def current_slot(now):
     h = now.hour
     if 8 <= h <= 11:
         return "morning"
-    if 12 <= h <= 17:
+    if 12 <= h <= 14:
         return "noon"
+    if 15 <= h <= 17:
+        return "afternoon"
     if 18 <= h <= 20:
         return "evening"
     if 21 <= h <= 23:
