@@ -31,6 +31,19 @@ INFRAGYM_BANNER = os.path.join(ROOT, "assets", "infragym_banner.png")
 # Evening (18:00) = daily RackShare promo (infra-engineer knowledge-sharing site).
 RACKSHARE_URL = "https://rackshare.jp/"
 
+# Afternoon (15:00) = daily whoami 年収診断 promo. Text only so X shows the site's
+# OGP link-card (whole card is tappable -> better click-through than an image).
+# UTM param marks the traffic as coming from X.
+WHOAMI_URL = "https://www.whoami-jobs.com/shindan/?utm_source=x&utm_medium=social"
+WHOAMI_ANGLES = [
+    "『同じ30歳でも、担当する工程だけで125万円ちがう』という事実から、自分の相場を知ろうという切り口",
+    "『今の年収、もしかして安い?』とモヤモヤしている人へ。まず転職市場の相場を知る、という切り口",
+    "運用監視から設計・構築・SREへ——担当する工程が変わると年収レンジが一段上がる、という切り口",
+    "資格やクラウドスキルが年収にどう効くか。8問60秒で、いま転職した場合の想定年収がわかる、という切り口",
+    "転職を考える前に、まず『いまの自分の想定年収』という現在地を把握しよう、という切り口",
+    "根拠は厚労省の賃金統計＋dodaの約60万件の転職データ。算出ロジックも公開、という信頼性の切り口",
+]
+
 # Mon/Thu night = CCNP problem-set book promo on Amazon (text only, no card).
 CCNP_BOOKS = {
     "encor": {"exam": "CCNP ENCOR 350-401", "url": "https://www.amazon.co.jp/dp/B0HHD6HK1R", "tags": "#CCNP #ENCOR #Cisco"},
@@ -245,6 +258,25 @@ def gen_rackshare(api_key, angle):
     return s
 
 
+def gen_whoami(api_key, angle):
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア)の投稿を作ります。
+無料の「whoami年収診断」への誘導投稿を1つ。
+サービスの事実: ネットワーク・インフラエンジニア専用の年収診断。年齢・担当工程・企業規模・勤務地・クラウドスキル・資格の8問(約60秒)に答えると、いま転職した場合の想定年収を算出。根拠は厚労省の賃金構造基本統計調査＋dodaの約60万件の職種別×年代別データで、算出ロジックも公開。登録不要でその場で結果が出る。誇大表現は禁止、事実ベースで誠実に。
+文体: です・ます調。一人称は「私」、読者は「あなた」。
+今回の切り口: {angle}
+
+【本文の絶対条件】短くまとめる。構成は「①切り口の要点を1〜2文(合計80字以内)→ 改行して {WHOAMI_URL} → ③短い一言CTA(例: 無料・登録不要、8問60秒で診断できます)」。長い説明・3段落以上は禁止。URLの後に画像は付けない(Xのリンクプレビューを活かす)。日本語全角=2/半角=1・URLは23として、全体で必ず255単位以内に収める(超えたら短くやり直す)。ハッシュタグは付けても #インフラエンジニア を1個だけ、無くてもよい。
+
+次のJSONだけを```json ... ```で出力:
+{{"post": "上記条件を厳守した短い投稿本文。改行で {WHOAMI_URL} を必ず1回含める。"}}"""
+    s = anthropic(api_key, prompt, max_tokens=900)
+    for _ in range(2):
+        if wlen(s.get("post", "")) <= 270:
+            break
+        s = anthropic(api_key, prompt + f"\n\n【再指示】前回が長すぎました。{WHOAMI_URL} を除いた地の文を削り、全体を240単位以内に必ず収めてください。", max_tokens=900)
+    return s
+
+
 def gen_ccnp(api_key, which, angle):
     b = CCNP_BOOKS[which]
     exam_short = b["exam"].split()[-1]  # 350-401 / 300-410
@@ -366,6 +398,21 @@ def main():
                     made.append(f"{date} night: career")
             except Exception as e:  # noqa: BLE001
                 print(f"[warn] {date} night failed: {e}", file=sys.stderr)
+
+        # afternoon (15:00) -> daily whoami 年収診断 promo (text only, OGP card)
+        atxt = os.path.join(ROOT, "queue", f"{date}-afternoon.txt")
+        aposted = os.path.join(ROOT, "posted", f"{date}-afternoon.txt")
+        apng = os.path.join(ROOT, "queue", f"{date}-afternoon.png")
+        if not os.path.exists(atxt) and not os.path.exists(aposted):
+            try:
+                angle = WHOAMI_ANGLES[i % len(WHOAMI_ANGLES)]
+                s = gen_whoami(api_key, angle)
+                open(atxt, "w", encoding="utf-8").write(s["post"].strip())
+                if os.path.exists(apng):  # text-only (let X show the OGP link card)
+                    os.remove(apng)
+                made.append(f"{date} afternoon: whoami")
+            except Exception as e:  # noqa: BLE001
+                print(f"[warn] {date} afternoon failed: {e}", file=sys.stderr)
 
         # evening (18:00) -> daily RackShare promo + card
         etxt = os.path.join(ROOT, "queue", f"{date}-evening.txt")
