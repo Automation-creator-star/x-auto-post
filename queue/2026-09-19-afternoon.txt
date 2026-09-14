@@ -1,5 +1,1 @@
-whoami年収診断は、厚労省の賃金統計とdodaの約60万件のデータをもとに算出ロジックも公開しています。根拠が明確だからこそ、信頼できる診断結果が得られます。
-
-https://www.whoami-jobs.com/shindan/?utm_source=x&utm_medium=social
-
-無料・登録不要で8問60秒。インフラエンジニア専用の年収診断です。
+__REGEN__
