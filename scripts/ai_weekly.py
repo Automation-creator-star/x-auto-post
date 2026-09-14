@@ -411,7 +411,8 @@ def main():
         atxt = os.path.join(ROOT, "queue", f"{date}-afternoon.txt")
         aposted = os.path.join(ROOT, "posted", f"{date}-afternoon.txt")
         apng = os.path.join(ROOT, "queue", f"{date}-afternoon.png")
-        if not os.path.exists(atxt) and not os.path.exists(aposted):
+        already_whoami = os.path.exists(atxt) and "whoami-jobs.com/shindan" in open(atxt, encoding="utf-8").read()
+        if not os.path.exists(aposted) and not already_whoami:
             try:
                 angle = WHOAMI_ANGLES[i % len(WHOAMI_ANGLES)]
                 s = gen_whoami(api_key, angle)
