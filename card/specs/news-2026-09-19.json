@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">GitHub大規模障害</span>から復旧",
+  "chips": [
+    "9/18夜～9/19朝",
+    "GitHub Actions停止",
+    "世界規模"
+  ],
+  "body": "GitHub.comやActionsが数時間利用不可に。クラウド依存のリスクを再認識する機会となりました。",
+  "source": "(出典: GitHub Status)"
+}

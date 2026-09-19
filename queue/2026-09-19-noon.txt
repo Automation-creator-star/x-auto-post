@@ -1,0 +1,1 @@
+【ITニュース】GitHubが大規模障害で世界中のサービスに影響。9月18日夜から19日朝にかけてGitHub.comやGitHub Actions等が利用不可となり、多くの開発現場で作業がストップ。現在は復旧済み。(出典: GitHub Status)
