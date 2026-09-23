@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Google生成AI</span>で大規模障害発生",
+  "chips": [
+    "Gemini",
+    "数時間停止",
+    "23日未明"
+  ],
+  "body": "日本時間23日未明、Googleの生成AIサービス群が世界規模で数時間利用不可に。順次復旧済み。",
+  "source": "(出典: Google Cloud Status)"
+}

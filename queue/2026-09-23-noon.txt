@@ -1,0 +1,1 @@
+【ITニュース】Googleが生成AIサービスで大規模障害を発生。23日未明から日本を含む世界各地でGemini、AI Studio、Vertex AIなどが数時間利用不可に。原因は調査中で順次復旧済み。クラウドサービスの冗長化設計やSLA確認の重要性を改めて示す事例です。(出典: Google Cloud Status)
