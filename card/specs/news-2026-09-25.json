@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">GitHub大規模障害</span>で世界中の開発が停止",
+  "chips": [
+    "約4時間",
+    "DB障害",
+    "Actions停止"
+  ],
+  "body": "WebサイトやAPIが利用不能になり、多くの企業の開発業務に影響。クラウドの単一障害点リスクを示す事例。",
+  "source": "(出典: GitHub Status)"
+}
