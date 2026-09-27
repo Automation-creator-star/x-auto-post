@@ -1,0 +1,10 @@
+{
+  "headline": "Apple<span class=\"hi\">ゼロデイ2件</span>修正の緊急更新",
+  "chips": [
+    "WebKit/RTKit",
+    "攻撃確認済",
+    "9/26配信"
+  ],
+  "body": "iPhoneやMacなど複数製品で既に攻撃が確認されたゼロデイ脆弱性を修正。企業環境では迅速な適用と脆弱性管理が重要です。",
+  "source": "(出典: Apple公式/各報道)"
+}
