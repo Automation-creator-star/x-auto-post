@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Windows Server 2025</span>一般提供開始",
+  "chips": [
+    "再起動なし更新",
+    "SMB over QUIC",
+    "9/30リリース"
+  ],
+  "body": "Hotpatchで再起動不要のセキュリティ更新、SMB over QUICで暗号化通信を標準サポート。ダウンタイム削減に貢献する新機能を搭載。",
+  "source": "(出典: Microsoft)"
+}
