@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Gmail送信者</span>に認証義務化開始",
+  "chips": [
+    "DMARC/SPF/DKIM",
+    "2025年2月",
+    "段階強化"
+  ],
+  "body": "Googleが全送信者へメール認証(DMARC/SPF/DKIM)を段階的に義務化。なりすまし対策の基本技術です。",
+  "source": "(出典: Google公式ブログ)"
+}
