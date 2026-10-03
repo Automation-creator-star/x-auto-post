@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome</span>が IP保護機能を展開",
+  "chips": [
+    "Android版",
+    "プロキシ経由",
+    "トラッキング対策"
+  ],
+  "body": "GoogleのプロキシでIPを隠蔽し、サイト側からの追跡を防ぐ新機能。段階的に展開中です。",
+  "source": "(出典: Bleeping Computer)"
+}

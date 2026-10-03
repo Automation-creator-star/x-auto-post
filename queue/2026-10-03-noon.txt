@@ -1,0 +1,1 @@
+【ITニュース】GoogleがAndroid版Chromeに「IPアドレス保護」機能を展開開始。ユーザーのIPアドレスをGoogleのプロキシサーバー経由で隠蔽し、トラッキングやフィンガープリント対策を強化。VPNと異なり「特定サイトへのアクセス時のみ動作」。(出典: Bleeping Computer)
