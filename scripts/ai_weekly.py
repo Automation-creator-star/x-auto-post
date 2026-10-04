@@ -5,7 +5,7 @@ Runs in GitHub Actions. For each of the next 7 JST dates that has no content
 yet, generates via the Anthropic API and renders the card image:
   morning: 【用語解説】term post  + blue diagram card
   night  : career message post    + green message card
-           (Tuesdays & Fridays instead: LINE-course link post + fixed banner)
+           (Mon/Thu: Udemy講座の紹介 / Tue/Fri: InfraGym promo + fixed banner)
 
 Only fills gaps (never overwrites an existing queue/posted file), so it is safe
 to run daily as a self-healing backfill as well as weekly.
@@ -13,6 +13,7 @@ to run daily as a self-healing backfill as well as weekly.
 Env: ANTHROPIC_API_KEY (required).
 """
 import datetime
+import difflib
 import glob
 import json
 import os
@@ -44,18 +45,59 @@ WHOAMI_ANGLES = [
     "自分ごと化×手軽さ: 8問60秒で『あなたの数字』が出る。年齢・工程・資格から、いま転職したらの想定年収を算出",
 ]
 
-# Mon/Thu night = CCNP problem-set book promo on Amazon (text only, no card).
-CCNP_BOOKS = {
-    "encor": {"exam": "CCNP ENCOR 350-401", "url": "https://www.amazon.co.jp/dp/B0HHD6HK1R", "tags": "#CCNP #ENCOR #Cisco"},
-    "enarsi": {"exam": "CCNP ENARSI 300-410", "url": "https://www.amazon.co.jp/dp/B0HHDW4FYS", "tags": "#CCNP #ENARSI #Cisco"},
-}
-CCNP_ANGLES = [
-    "『参考書は読んだが、本番レベルの問題演習が足りない』という悩みに、問題を解いて知識を定着させる切り口",
-    "『知識は覚えたのに、問題になると迷う』という悩みに、状況を読んで適切な答えを選ぶ力を鍛える切り口",
-    "試験直前の総仕上げ・弱点チェックとして、抜け漏れを問題演習で洗い出す切り口",
-    "CCNPは読むだけでなく、実際に解いて『判断できる状態』にすることが合格の分かれ目、という切り口",
-    "独学で手が止まりがちな人へ。まず1問ずつ解きながら理解を確認していけばいい、という背中押しの切り口",
+# Mon/Thu night = Udemy講座の紹介(テキストのみ。XがUdemyのリンクカードを表示する)。
+# Kindle(Amazon)のCCNP問題集の宣伝は2026-10-04で終了。
+# 5講座を月・木の順番で1本ずつローテーション(同じ講座が連続しない)。
+UDEMY_COURSES = [
+    {
+        "key": "ccna",
+        "url": "https://www.udemy.com/course/ccna-200-301-practice-exam-jp/?referralCode=1001F8F2239359150115",
+        "title": "合格者1,000名超の講師が作成！CCNA 200-301【v1.1対応】本番形式の模擬試験問題集 6回・600問",
+        "facts": "CCNA 200-301(v1.1)対応。120分・100問の模試6回(全600問)で全6分野を網羅。正解の理由だけでなく、間違いの選択肢がなぜ違うかまで全問解説。対象: 参考書やWeb問題集を解き終えて別の問題で実力を確かめたい人、試験直前に弱点分野を洗い出したい人。",
+        "tags": "#CCNA",
+    },
+    {
+        "key": "encor",
+        "url": "https://www.udemy.com/course/ccnp-encor-350-401-practice-exam-jp/?referralCode=A21B0AEB3D8447F883CB",
+        "title": "【2026最新・v1.2対応】合格者1,000名超の講師が作成！CCNP ENCOR 350-401 模試6回・600問",
+        "facts": "CCNP ENCOR 350-401(v1.2)対応。120分・100問の模試6回(全600問)。対象: 参考書や動画講座を終えて本番形式で実力を確認したい人、試験直前に弱点分野を特定して仕上げたい人。",
+        "tags": "#CCNP #ENCOR",
+    },
+    {
+        "key": "nwdesign",
+        "url": "https://www.udemy.com/course/network-design-document/?referralCode=8D4D33119B37DA2CF20A",
+        "title": "【Word・Excelテンプレート付】ネットワーク基本設計書の書き方｜設計書が書けるようになる実務入門",
+        "facts": "ネットワークの基本設計書を39分(全25講義)で最後まで。論理設計・物理設計・非機能設計の書き方を、1つの実案件を題材に学ぶ。論理構成図とセグメント一覧の対応、アドレス・VLANの割り当て方針、ポート収容の決め方、可用性・セキュリティ・運用保守設計。Word形式の基本設計書テンプレートとExcelテンプレート3点(セグメント一覧・ポート収容表・通信要件表)付き。対象: 運用・監視から設計構築へ進みたい人、設計書を書いたことがない人。",
+        "tags": "#ネットワークエンジニア",
+    },
+    {
+        "key": "cissp1",
+        "url": "https://www.udemy.com/course/cissp-domain1/?referralCode=63FDA90AD0C2EB5947FC",
+        "title": "【日本人講師が教える】ゼロからわかるCISSP講座 ドメイン1：セキュリティとリスクマネジメント",
+        "facts": "CISSPドメイン1だけを46レクチャー・約2時間で完走。翻訳ではない日本語オリジナルの解説。本番形式の演習43問で『4つとも正しく見える』問題の選び方まで身につける。内容: CIA・真正性・否認防止、リスク/脅威/脆弱性の関係、ポリシー・標準・手順・ガイドラインの違い、法令・コンプライアンス・倫理、事業継続とガバナンス。対象: CISSPの学習をはじめる人、参考書が難しいと感じている人。",
+        "tags": "#CISSP",
+    },
+    {
+        "key": "enarsi",
+        "url": "https://www.udemy.com/course/ccnp-enarsi-300-410-practice-exam-jp/?referralCode=390B0E96280FF06EA7FF",
+        "title": "【2026最新・v1.1対応】合格者1,000名超の講師が作成！CCNP ENARSI 300-410 模試6回600問",
+        "facts": "CCNP ENARSI 300-410(v1.1)対応。本番と同じペースの100問模試6回(全600問)でv1.1の全4分野を網羅。設定・show出力・debugを読む問題が中心で、全選択肢を解説。対象: 参考書や動画講座を終えて本番形式で実力を確認したい人、試験直前に弱点分野を洗い出したい人。",
+        "tags": "#CCNP #ENARSI",
+    },
 ]
+UDEMY_ANGLES = [
+    "受講者の悩み(つまずきポイント)への共感から入り、この講座で何ができるようになるかを具体的に示す",
+    "この講座の中身を具体的な数字(問題数・時間・レクチャー数・テンプレート数など、事実のみ)で端的に伝える",
+    "『こんな人に向いている』を明確にして、該当する人に届くように書く",
+]
+
+
+def udemy_course_for(d):
+    """Mon/Thu の何回目かで講座を決める(月・木で1本ずつ順番に進む)。"""
+    week = (d.toordinal() - 1) // 7  # Monday-based week number
+    n = week * 2 + (1 if d.weekday() == 3 else 0)
+    return UDEMY_COURSES[n % len(UDEMY_COURSES)], UDEMY_ANGLES[(n // len(UDEMY_COURSES)) % len(UDEMY_ANGLES)]
+
 
 # NESPE campaign: during this window the night slot becomes a campaign post
 # driving to the LP (replacing the usual career / LINE-CCNA nights).
@@ -92,6 +134,102 @@ def anthropic(api_key, prompt, max_tokens=1500):
     return json.loads(m.group(1), strict=False)
 
 
+# 朝の用語は「AIに選ばせない」。このリストから未使用のものを順番に使う
+# (AIに既出リストを渡しても同じ用語(CDP)を選び続けたため)。
+TERM_POOL = [
+    "ポートセキュリティ", "DHCPスヌーピング", "DAI", "IPv6", "リンクローカルアドレス", "SLAAC",
+    "EUI-64", "NDP", "APIPA", "CIDR", "VLSM", "ルート集約", "アドミニストレーティブディスタンス",
+    "メトリック", "ロンゲストマッチ", "フローティングスタティックルート", "デフォルトルート",
+    "ネイティブVLAN", "ボイスVLAN", "PortFast", "BPDUガード", "ルートガード", "RSTP", "MSTP",
+    "コリジョンドメイン", "ブロードキャストドメイン", "全二重と半二重", "オートネゴシエーション",
+    "MACアドレステーブル", "ARPテーブル", "TTL", "3ウェイハンドシェイク", "ウィンドウサイズ",
+    "PAT", "スタティックNAT", "内部ローカルアドレス", "NTP", "SSH", "AAA", "TACACS+",
+    "802.1X", "WPA3", "SSID", "WLC", "CAPWAP", "チャネルボンディング", "2.4GHzと5GHz",
+    "OSPFエリア", "DR/BDR", "ルーターID", "LSA", "SPF", "ハローパケット", "デッドインターバル",
+    "標準ACLと拡張ACL", "ワイルドカードマスク", "暗黙のdeny", "ステートフルファイアウォール",
+    "IPS", "VPN", "IPsec", "GRE", "SD-WAN", "SDN", "コントロールプレーン", "データプレーン",
+    "REST API", "JSON", "Ansible", "NETCONF", "Cisco DNA Center", "仮想化", "コンテナ",
+    "クラウドの3つのサービスモデル", "PoE+", "光ファイバー(シングルモードとマルチモード)",
+    "UTPケーブル", "ストレートとクロス", "Auto-MDIX", "ループバックインターフェイス",
+    "サブインターフェイス", "ルーターオンアスティック", "レイヤ3スイッチ", "CEF", "MTUとMSS",
+    "フラグメンテーション", "traceroute", "ping", "show ip interface brief", "running-configとstartup-config",
+    "コンフィグレジスタ", "IOSのモード", "enable secret", "バナー(MOTD)", "CDPとLLDPの違い",
+]
+
+
+def _norm(t):
+    return re.sub(r"[\s　()（）/・\-]", "", t or "").upper()
+
+
+def pick_term(avoid):
+    used = {_norm(t) for t in avoid}
+    for t in TERM_POOL:
+        if _norm(t) not in used:
+            return t
+    return None
+
+
+def _first_line(path):
+    try:
+        return open(path, encoding="utf-8").read().strip()
+    except OSError:
+        return ""
+
+
+def recent_texts(slot, days=21):
+    """Texts already posted/queued for a slot (newest first)."""
+    files = sorted(glob.glob(os.path.join(ROOT, "posted", f"*-{slot}.txt"))
+                   + glob.glob(os.path.join(ROOT, "queue", f"*-{slot}.txt")), reverse=True)
+    return [_first_line(f) for f in files[: days * 2]]
+
+
+def too_similar(text, others, th=0.55):
+    head = text[:120]
+    return any(difflib.SequenceMatcher(None, head, o[:120]).ratio() >= th for o in others if o)
+
+
+def purge_duplicates(today):
+    """Delete future queue files that repeat an already-used topic so they get regenerated."""
+    removed = []
+    seen_terms = set()
+    for p in sorted(glob.glob(os.path.join(ROOT, "posted", "*-morning.txt"))):
+        mm = re.search(r"【用語解説】(.+?)とは", _first_line(p))
+        if mm:
+            seen_terms.add(_norm(mm.group(1)))
+    for p in sorted(glob.glob(os.path.join(ROOT, "queue", "*-morning.txt"))):
+        date = os.path.basename(p)[:10]
+        if date < today.isoformat():
+            continue
+        mm = re.search(r"【用語解説】(.+?)とは", _first_line(p))
+        key = _norm(mm.group(1)) if mm else ""
+        if key and key in seen_terms:
+            os.remove(p)
+            png = p.replace(".txt", ".png")
+            if os.path.exists(png):
+                os.remove(png)
+            removed.append(os.path.basename(p))
+        elif key:
+            seen_terms.add(key)
+    for slot in ("afternoon", "evening", "night"):
+        prior = [_first_line(p) for p in sorted(glob.glob(os.path.join(ROOT, "posted", f"*-{slot}.txt")))[-14:]]
+        for p in sorted(glob.glob(os.path.join(ROOT, "queue", f"*-{slot}.txt"))):
+            if os.path.basename(p)[:10] < today.isoformat():
+                continue
+            t = _first_line(p)
+            # CCNP/InfraGym nights are fixed-format promos; only compare career-type nights
+            if slot == "night" and ("udemy.com" in t or "lp.theit.co.jp" in t):
+                continue
+            if too_similar(t, prior[-5:]):
+                os.remove(p)
+                png = p.replace(".txt", ".png")
+                if os.path.exists(png):
+                    os.remove(png)
+                removed.append(os.path.basename(p))
+            else:
+                prior.append(t)
+    return removed
+
+
 def used_terms():
     terms = set()
     for d in ("queue", "posted"):
@@ -122,7 +260,12 @@ def render(script, spec, out_png):
 
 
 def gen_morning(api_key, avoid):
-    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、CCNA/ネットワーク教育)の朝の投稿を作ります。CCNA/ネットワークの重要用語を1つ、初学者向けに解説してください。既出の用語は避ける。既出: {', '.join(sorted(avoid)) or 'なし'}
+    term = pick_term(avoid)
+    if term:
+        topic = f"今回解説する用語は必ず「{term}」。別の用語に変えてはいけない。"
+    else:
+        topic = f"CCNA/ネットワークの重要用語を1つ選ぶ。次の既出用語は絶対に使わない: {', '.join(sorted(avoid))}"
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、CCNA/ネットワーク教育)の朝の投稿を作ります。CCNA/ネットワークの用語を1つ、初学者向けに解説してください。{topic}
 
 次のJSONだけを```json ... ```で出力:
 {{
@@ -136,8 +279,21 @@ def gen_morning(api_key, avoid):
     return anthropic(api_key, prompt, max_tokens=2000)
 
 
-def gen_career(api_key):
-    prompt = """あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア、CCNA教育)の夜の投稿を作ります。未経験からの転職・学習法・資格の価値・実務での成長などを、元インフラエンジニア社長の目線で前向きに1つ。
+CAREER_THEMES = [
+    "勉強時間の作り方(働きながら)", "資格の価値と限界", "現場で評価される人の共通点", "障害対応で学んだこと",
+    "設計・構築へのステップアップ", "上司・先輩への質問・報連相のコツ", "転職のタイミングの見極め",
+    "手順書・ドキュメントを書く力", "英語ドキュメントとの付き合い方", "クラウド時代のネットワークエンジニア",
+    "運用監視から抜け出す方法", "検証環境(Packet Tracer/実機)で手を動かす価値", "30代からの学び直し",
+    "面接で実務経験をどう話すか",
+]
+
+
+def gen_career(api_key, theme, recent):
+    avoid = "\n".join("- " + r.splitlines()[0][:60] for r in recent[:10] if r)
+    prompt = """あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア、CCNA教育)の夜の投稿を作ります。元インフラエンジニア社長の目線で前向きに1つ。
+今回のテーマ(必ずこれで書く): """ + theme + """
+直近の投稿と書き出し・主張が被らないこと(「実務1年目」「未経験の1年目」で始めるのは禁止)。直近の投稿:
+""" + avoid + """
 
 次のJSONだけを```json ... ```で出力:
 {
@@ -286,43 +442,42 @@ def gen_whoami(api_key, angle):
     return s
 
 
-def gen_ccnp(api_key, which, angle):
-    b = CCNP_BOOKS[which]
-    exam_short = b["exam"].split()[-1]  # 350-401 / 300-410
-    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア)の夜の投稿を作ります。
-Amazonで公開している「{b['exam']}対策の問題集」への誘導投稿を1つ、次の【フォーマット】に沿って作ってください。
-本の位置づけ: 参考書だけでは足りない本番レベルの問題演習を補い、解きながら知識を定着させ、試験直前の弱点チェックにも使える問題集。CCNPは読むだけでなく実際に解いて『判断できる状態』にすることが重要。誇大表現(絶対合格・簡単に等)は禁止、事実ベースで誠実に。
-文体: です・ます調。今回の切り口: {angle}
+def gen_udemy(api_key, course, angle):
+    url = course["url"]
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア、CCNA/CCNP/CISSP教育)の夜の投稿を作ります。
+自分が作ったUdemy講座の紹介投稿を1つ。
+講座名: {course['title']}
+講座の事実: {course['facts']}
+今回の切り口: {angle}
 
-【フォーマット】(各行は改行で区切る。内容は毎回言い回しを変える):
-📘 {b['exam']}を勉強中の方へ
-（悩みを「」付きで2つ、勉強中の人が思わず頷くもの）
-そんな方向けに、{b['exam']}対策の問題集をAmazonで公開しました。
-（空行）
-✅ {exam_short}対策
-✅ （問題を解いて知識を定着、などの利点）
-✅ （試験前の弱点チェックにおすすめ、などの利点）
-（空行）
-（CCNPは読むだけでなく解いて“判断できる状態”にすることが重要、という趣旨の一言を2文程度で）
-これから{exam_short}を受験する方は、ぜひ学習に活用してください👇
-{b['url']}
-{b['tags']} #ネットワークエンジニア #インフラエンジニア
+【ルール】
+- 書いてよいのは上の事実だけ。受講者数・評価・セール価格・合格率・体験談など、書かれていない数字や話を作らない。誇大表現(絶対合格・誰でも・簡単に等)は禁止。
+- 講師の実績(合格者1,000名超など)と講座の中身を、論理的につながらない形で結びつけない(例:「現場の経験から本番で問われる判断を問題にした」はNG)。実績に触れるなら講座名の事実として軽く触れる程度。
+- 「再配布」という語は使わない(ルーティングのredistributionは「再配送」)。
+- 文体: です・ます調。一人称は「私」。宣伝くさくしすぎず、講師本人の一言として自然に。
+- 構成: ①読者が手を止める1文目 → ②講座で得られることを1〜2文 → 改行して {url} → ③短いCTA1文。箇条書きは使ってもよいが3行まで。
+- URLは {url} をそのまま1回だけ入れる(紹介コードを消さない・書き換えない)。
+- 日本語全角=2/半角=1・URLは23として、全体で必ず260単位以内。ハッシュタグは末尾に {course['tags']} のみ(他は付けない)。
 
 次のJSONだけを```json ... ```で出力:
-{{"post": "上記フォーマットに沿った投稿本文。改行で {b['url']} を必ず1回含める。"}}"""
-    s = anthropic(api_key, prompt, max_tokens=1200)
-    # Full (long) format: allow long posts (account uses X Premium). Only guard
-    # against a runaway generation.
+{{"post": "上記条件を厳守した投稿本文"}}"""
+    s = anthropic(api_key, prompt, max_tokens=900)
     for _ in range(2):
-        if wlen(s.get("post", "")) <= 900:
+        post = s.get("post", "")
+        if wlen(post) <= 270 and url in post:
             break
-        s = anthropic(api_key, prompt + "\n\n【再指示】前回が長すぎました。各項目を1行に収め、全体を600単位以内にしてください。", max_tokens=1200)
+        s = anthropic(api_key, prompt + f"\n\n【再指示】前回は長すぎたか、URLが正しく入っていませんでした。{url} をそのまま1回入れ、全体を240単位以内にしてください。", max_tokens=900)
+    if url not in s.get("post", ""):
+        raise ValueError("udemy post missing course URL")
     return s
 
 
 def main():
     api_key = os.environ["ANTHROPIC_API_KEY"]
     today = datetime.datetime.now(JST).date()
+    removed = purge_duplicates(today)
+    if removed:
+        print("Removed duplicate queued posts (will regenerate):\n" + "\n".join(removed))
     avoid = used_terms()
     made = []
 
@@ -337,6 +492,8 @@ def main():
         if not os.path.exists(mtxt) and not os.path.exists(mposted):
             try:
                 s = gen_morning(api_key, avoid)
+                if _norm(s.get("term")) in {_norm(t) for t in avoid}:
+                    raise ValueError(f"duplicate term returned: {s.get('term')}")
                 open(mtxt, "w", encoding="utf-8").write(s["post"].strip())
                 render("make_card.py", {k: s[k] for k in ("term", "sub", "desc", "diagram") if k in s}
                        | ({"term_size": s["term_size"]} if s.get("term_size") else {}),
@@ -353,24 +510,23 @@ def main():
         campaign = d <= CAMPAIGN_END
 
         # Night slot by weekday (outside the NESPE campaign window):
-        #   Mon -> CCNP ENCOR book, Thu -> CCNP ENARSI book (text only),
+        #   Mon/Thu -> Udemy講座の紹介(5講座ローテーション, text only),
         #   Tue/Fri -> InfraGym, else -> career.
-        # Campaign (if active) overrides all. CCNP days replace an existing
-        # non-CCNP night so the schedule change applies to already-queued days;
+        # Campaign (if active) overrides all. Udemy days replace an existing
+        # night that isn't that day's Udemy course (e.g. old Kindle posts);
         # other days only fill gaps.
-        ccnp_which = "encor" if wd == 0 else ("enarsi" if wd == 3 else None)
-        already_campaign = os.path.exists(ntxt) and LP_URL[:22] in open(ntxt, encoding="utf-8").read()
-        already_ccnp = (
-            ccnp_which is not None
-            and os.path.exists(ntxt)
-            and CCNP_BOOKS[ccnp_which]["url"] in open(ntxt, encoding="utf-8").read()
-        )
+        udemy = udemy_course_for(d) if wd in (0, 3) else None
+        ntext = open(ntxt, encoding="utf-8").read() if os.path.exists(ntxt) else ""
+        already_campaign = LP_URL[:22] in ntext
+        already_udemy = udemy is not None and udemy[0]["url"] in ntext
+        # Kindle(Amazon)の宣伝が残っていたら曜日に関係なく作り直す
+        stale_kindle = "amazon.co.jp" in ntext
         do_night = (
             not os.path.exists(nposted)
             and (
                 (campaign and not already_campaign)
-                or (not campaign and ccnp_which is not None and not already_ccnp)
-                or (not campaign and ccnp_which is None and not os.path.exists(ntxt))
+                or (not campaign and udemy is not None and not already_udemy)
+                or (not campaign and udemy is None and (not ntext or stale_kindle))
             )
         )
         if do_night:
@@ -384,13 +540,13 @@ def main():
                            | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
                            npng)
                     made.append(f"{date} night: campaign")
-                elif ccnp_which is not None:  # Mon/Thu -> CCNP book (text only)
-                    angle = CCNP_ANGLES[d.isocalendar()[1] % len(CCNP_ANGLES)]
-                    s = gen_ccnp(api_key, ccnp_which, angle)
+                elif udemy is not None:  # Mon/Thu -> Udemy course (text only, link card)
+                    course, angle = udemy
+                    s = gen_udemy(api_key, course, angle)
                     open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
                     if os.path.exists(npng):  # ensure text-only (drop any stale card)
                         os.remove(npng)
-                    made.append(f"{date} night: ccnp({ccnp_which})")
+                    made.append(f"{date} night: udemy({course['key']})")
                 elif wd in (1, 4):  # Tue / Fri -> InfraGym promo + banner
                     pattern = "game" if wd == 1 else "pain"
                     s = gen_infragym(api_key, pattern)
@@ -398,7 +554,7 @@ def main():
                     subprocess.run(["cp", INFRAGYM_BANNER, npng], check=True)
                     made.append(f"{date} night: infragym({pattern})")
                 else:
-                    s = gen_career(api_key)
+                    s = gen_career(api_key, CAREER_THEMES[d.toordinal() % len(CAREER_THEMES)], recent_texts("night"))
                     open(ntxt, "w", encoding="utf-8").write(s["post"].strip())
                     render("make_career_card.py",
                            {k: s[k] for k in ("badge", "headline", "body") if k in s}
@@ -415,7 +571,7 @@ def main():
         already_whoami = os.path.exists(atxt) and "whoami-jobs.com/shindan" in open(atxt, encoding="utf-8").read()
         if not os.path.exists(aposted) and not already_whoami:
             try:
-                angle = WHOAMI_ANGLES[i % len(WHOAMI_ANGLES)]
+                angle = WHOAMI_ANGLES[d.toordinal() % len(WHOAMI_ANGLES)]
                 s = gen_whoami(api_key, angle)
                 open(atxt, "w", encoding="utf-8").write(s["post"].strip())
                 if os.path.exists(apng):  # text-only (let X show the OGP link card)
@@ -430,7 +586,7 @@ def main():
         epng = os.path.join(ROOT, "queue", f"{date}-evening.png")
         if not os.path.exists(etxt) and not os.path.exists(eposted):
             try:
-                angle = RACKSHARE_ANGLES[i % len(RACKSHARE_ANGLES)]
+                angle = RACKSHARE_ANGLES[d.toordinal() % len(RACKSHARE_ANGLES)]
                 s = gen_rackshare(api_key, angle)
                 open(etxt, "w", encoding="utf-8").write(s["post"].strip())
                 render("make_rackshare_card.py",
