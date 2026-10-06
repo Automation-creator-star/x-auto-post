@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Android</span>に重大な脆弱性、修正版公開",
+  "chips": [
+    "40件以上修正",
+    "Critical級含む",
+    "RCEリスクあり"
+  ],
+  "body": "Googleが10月のセキュリティパッチを公開。深刻度Criticalを含む脆弱性に対応しており、早期適用が重要です。",
+  "source": "(出典: Googleセキュリティ情報)"
+}
