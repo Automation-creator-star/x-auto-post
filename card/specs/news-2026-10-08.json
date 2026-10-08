@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Cloudflare</span>で大規模障害発生",
+  "chips": [
+    "10月7日",
+    "CDN/DNS",
+    "接続エラー"
+  ],
+  "body": "CDN・DNS大手の障害により多数のサイトに影響。単一事業者依存のリスクを再認識する事例です。",
+  "source": "(出典: Cloudflare Status)"
+}
