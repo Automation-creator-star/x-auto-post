@@ -1,0 +1,1 @@
+【ITニュース】Appleが「macOS Sequoia 15.0.1」を緊急公開。ゼロデイ脆弱性2件(CVE-2024-44308/44309)が実際に悪用されており、JavaScriptCoreとWebKitの脆弱性により任意コード実行のリスク。macOS利用者は速やかなアップデート推奨。(出典: Apple/各報道)

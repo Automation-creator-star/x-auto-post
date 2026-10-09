@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">ゼロデイ2件</span>悪用でmacOS緊急更新",
+  "chips": [
+    "CVE-2024-44308",
+    "CVE-2024-44309",
+    "任意コード実行"
+  ],
+  "body": "JavaScriptCoreとWebKitの脆弱性が実際に悪用され、Appleが緊急パッチ公開。速やかな適用を。",
+  "source": "(出典: Apple/各報道)"
+}
