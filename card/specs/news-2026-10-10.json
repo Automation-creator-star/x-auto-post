@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome 130</span>緊急更新公開",
+  "chips": [
+    "Use-After-Free",
+    "悪用確認済み",
+    "即時更新推奨"
+  ],
+  "body": "解放済みメモリアクセスを許す脆弱性に対処。実際の悪用事例も確認されており即時更新が必要です。",
+  "source": "(出典: Google)"
+}
