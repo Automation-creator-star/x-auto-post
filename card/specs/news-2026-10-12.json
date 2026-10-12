@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">ChatGPT</span>でプロンプト流出の脆弱性",
+  "chips": [
+    "OpenAI公表",
+    "暗号化の不備",
+    "機密情報注意"
+  ],
+  "body": "プロンプトの暗号化処理に脆弱性。AIサービス利用時も機密情報は入力しない原則が重要。",
+  "source": "(出典: ITmedia/TechCrunch)"
+}
