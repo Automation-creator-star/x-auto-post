@@ -1,0 +1,9 @@
+CISSP、ドメイン1だけで46レクチャー・約2時間です。
+
+翻訳ではない日本語オリジナルの解説と、本番形式の演習43問で「4つとも正しく見える」問題の選び方まで扱っています。
+
+https://www.udemy.com/course/cissp-domain1/?referralCode=63FDA90AD0C2EB5947FC
+
+参考書が難しいと感じている方はぜひ。
+
+#CISSP
