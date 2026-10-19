@@ -1,0 +1,9 @@
+CCNP ENARSI 300-410の模試を600問作りました。
+
+本番と同じ100問×6回分で、v1.1の全4分野を網羅しています。設定・show出力・debugを読む問題が中心で、全選択肢に解説を付けました。参考書や動画を終えた方、試験直前に弱点を洗い出したい方向けです。
+
+https://www.udemy.com/course/ccnp-enarsi-300-410-practice-exam-jp/?referralCode=390B0E96280FF06EA7FF
+
+本番形式で実力を確認できます。
+
+#CCNP #ENARSI
