@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Apple緊急パッチ</span>配信 ゼロデイ2件",
+  "chips": [
+    "悪用確認済み",
+    "全製品対象",
+    "即時適用推奨"
+  ],
+  "body": "WebKitとRTKitの脆弱性に対応。任意コード実行リスクがあり、すでに攻撃が観測されています。",
+  "source": "(出典: Apple Security Updates)"
+}
