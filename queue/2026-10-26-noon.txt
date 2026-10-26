@@ -1,0 +1,1 @@
+【ITニュース】Appleが10月24日、iOS 18.1/iPadOS 18.1をリリース。積極的に悪用された可能性のあるゼロデイ脆弱性2件を修正。JavaScriptCoreとWebKitの脆弱性で、悪意あるWebコンテンツ処理で任意コード実行やクロスサイトスクリプティング攻撃のリスク。(出典: Apple Security Updates)

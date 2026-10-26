@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">iOS 18.1</span>で悪用済みゼロデイ2件を修正",
+  "chips": [
+    "10/24リリース",
+    "JavaScriptCore",
+    "WebKit脆弱性"
+  ],
+  "body": "悪意あるWebコンテンツ処理で任意コード実行等のリスク。ゼロデイ攻撃への迅速なパッチ適用が重要です。",
+  "source": "(出典: Apple Security Updates)"
+}
