@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">iOS 18.1</span>緊急リリース 脆弱性26件修正",
+  "chips": [
+    "脆弱性26件",
+    "悪用の可能性",
+    "10/25配信"
+  ],
+  "body": "任意コード実行やDoS攻撃のリスクを修正。音声メモとJavaScriptCoreの脆弱性は悪用された可能性あり。",
+  "source": "(出典: Apple Security)"
+}
