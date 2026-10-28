@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Windows緊急更新</span>117件の脆弱性修正",
+  "chips": [
+    "ゼロデイ悪用確認",
+    "NTLM脆弱性",
+    "117件修正"
+  ],
+  "body": "10月の定例更新で既に悪用されているゼロデイ脆弱性を含む大量の修正。早急なパッチ適用を推奨。",
+  "source": "(出典: Microsoft Security Response Center)"
+}

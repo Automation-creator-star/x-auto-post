@@ -1,0 +1,1 @@
+【ITニュース】Microsoftが10月のセキュリティ更新でWindowsのゼロデイ脆弱性含む117件の脆弱性を修正。NTLMハッシュ漏洩の脆弱性(CVE-2024-43451)は既に悪用が確認されており緊急対応が必要。ネットワーク管理者は優先度の高い更新から適用を。(出典: Microsoft Security Response Center)
