@@ -1,0 +1,9 @@
+設計書を書いたことがない人、運用・監視から設計構築へ進みたい人へ。
+
+論理設計・物理設計・非機能設計を、1つの実案件を題材に39分で学べます。Word・Excel形式のテンプレート4点付き。
+
+https://www.udemy.com/course/network-design-document/?referralCode=8D4D33119B37DA2CF20A
+
+設計書が書けると、仕事の幅が変わります。
+
+#ネットワークエンジニア
