@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Googleが11月</span>のセキュリティ更新公開",
+  "chips": [
+    "ゼロデイ脆弱性",
+    "Chrome/Android",
+    "パッチ適用"
+  ],
+  "body": "Chromeで悪用確認済みの脆弱性を含む複数の修正。速やかな更新適用を。",
+  "source": "(出典: 複数のセキュリティ情報)"
+}
