@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome緊急更新</span>ゼロデイ脆弱性を修正",
+  "chips": [
+    "CVE-2024-10487",
+    "悪用確認済み",
+    "Chrome 131"
+  ],
+  "body": "実際の攻撃で既に悪用されているゼロデイ脆弱性を修正。ブラウザは即座に更新を。",
+  "source": "(出典: BleepingComputer)"
+}
