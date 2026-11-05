@@ -1,0 +1,7 @@
+「参考書は終えたけど、本番形式で解く練習が足りない」と感じている方へ。CCNP ENARSI 300-410の模擬試験を作りました。本番と同じ100問×6回で、設定・show・debugを読む問題が中心です。
+
+https://www.udemy.com/course/ccnp-enarsi-300-410-practice-exam-jp/?referralCode=390B0E96280FF06EA7FF
+
+試験直前の弱点洗い出しにもどうぞ。
+
+#CCNP #ENARSI
