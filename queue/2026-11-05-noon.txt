@@ -1,0 +1,1 @@
+【ITニュース】Microsoftが11月の月例パッチで89件の脆弱性を修正、うち4件がゼロデイ脆弱性(既に悪用確認済み2件含む)。Windows KerberosやTask Schedulerなど重要コンポーネントに影響。企業インフラでは優先的にパッチ適用が必要。(出典: BleepingComputer/各種セキュリティメディア)
