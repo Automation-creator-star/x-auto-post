@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Chrome 131</span>緊急アップデート公開",
+  "chips": [
+    "脆弱性7件修正",
+    "High含む",
+    "11/6配信"
+  ],
+  "body": "Type Confusionなど重大度Highの脆弱性を含む7件を修正。自動更新が既に配信中です。",
+  "source": "(出典: Google公式ブログ)"
+}
