@@ -1,0 +1,1 @@
+【ITニュース】GoogleがGemini 2.0 Flashを発表、APIとGoogle AI Studioで利用可能に。前世代の1.5 Proより高速で高性能、画像・音声・テキストを統合処理できるマルチモーダル対応AIモデル。AI開発競争を加速させる動きとして注目される。(出典: Google公式ブログ)
