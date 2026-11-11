@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Android</span>に重大な脆弱性",
+  "chips": [
+    "85件修正",
+    "Critical評価",
+    "11月パッチ"
+  ],
+  "body": "Googleが11月のセキュリティパッチで重大な脆弱性を含む85件を修正。リモートコード実行の恐れがある問題も。",
+  "source": "(出典: Google)"
+}
