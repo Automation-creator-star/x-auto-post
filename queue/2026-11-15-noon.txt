@@ -1,0 +1,1 @@
+【ITニュース】Appleが2026年11月14日、iOS/iPadOS/macOS/visionOSなど全製品向けに緊急セキュリティアップデートを公開。ゼロデイ脆弱性2件(WebKit/RTKitの任意コード実行)が悪用確認済みで即時適用を推奨。(出典: Apple Security Updates)

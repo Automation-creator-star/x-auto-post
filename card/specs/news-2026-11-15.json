@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Apple緊急更新</span> ゼロデイ2件悪用済",
+  "chips": [
+    "即時適用推奨",
+    "WebKit/RTKit",
+    "全製品対象"
+  ],
+  "body": "パッチ公開前から攻撃されているゼロデイ脆弱性2件に対応。iOS/macOS等すべてのOSで即時更新が必要です。",
+  "source": "(出典: Apple Security Updates)"
+}
