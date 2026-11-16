@@ -464,7 +464,7 @@ WHOAMI_FACTS = """【使ってよい数字(これ以外の金額・割合は書�
 - サーバ構築: 20代411 / 30代520 / 40代664
 - 設計・上流: 20代439 / 30代594 / 40代723 / 50代851
 - アーキテクト・SRE・PM: 20代517 / 30代705 / 40代855 / 50代867
-- 30歳の基準額: 監視・運用402 / NW構築466 / サーバ構築474 / 設計・上流527 / アーキテクト等624。同じ30歳でも担当工程だけで年収が125万円ちがう(402→527)。
+- 30歳の基準額: 監視・運用402 / NW構築466 / サーバ構築474 / 設計・上流527 / アーキテクト等624。同じ30歳でも担当工程だけで年収が最大222万円ちがう(監視・運用402→アーキテクト等624)。
 - 30代の監視・運用(441)とアーキテクト・SRE・PM(705)の差は264万円。
 - 診断の補正: 東京勤務+10.6%、東京以外-5.0%、クラウド実務あり+10%。"""
 
@@ -484,7 +484,7 @@ WHOAMI_REPLIES = [
 
 WHOAMI_KIND_GUIDE = {
     "loss": "損失回避型。『相場を知らずに働くと毎年いくら損しているか分からない』という痛みで止める。数字は【使ってよい数字】からだけ。",
-    "curiosity": "好奇心型。『同じ30歳で125万円の差。あなたはどっち側?』のように答えを知りたくさせる。結論は書かずに引く。",
+    "curiosity": "好奇心型。『同じ30歳でも工程で最大222万円の差。あなたはどの位置?』のように答えを知りたくさせる。結論は書かずに引く。",
     "table": "年収表の画像を添付して出す投稿。画像には工程×年代の年収表が載っている。本文は画像を見たくなる1〜2行と『保存しておくと便利です』程度の一言。表の数字を本文に並べすぎない(1つだけ引用するのは可)。",
     "data": "データ型。【使ってよい数字】から1つの切り口(例: 30代で工程により264万円差、30代で運用から構築に移ると約80万円差、東京勤務は+10.6%など)を取り上げ、意外性のある事実として短く示す。",
     "story": "ストーリー型。【飯塚本人の事実】から1つのエピソードを選び、読者の今の状況に重ねて『あなたの今の位置を知ることが最初の一歩』につなげる。一人称は「私」。事実にないエピソード・数字は作らない。",
@@ -510,6 +510,7 @@ def gen_whoami_v2(api_key, d, kind, recent):
 - 読者を「あなた」で名指しする。です・ます調ベースで歯切れよく。
 - 本文にURL・ハッシュタグ・「プロフィールのリンクから」等は入れない。最後は『自分の場合はどうか、気になりませんか』のような問いや余韻で終える(返信にリンクが続く前提)。
 - 「登録不要」「登録なし」とは絶対に書かない(診断にはメールアドレスの入力が必要)。
+- 「125万円」という数字は使わない(30歳の工程差は最大222万円と書く)。
 - 作り話の体験談・実績・数字は禁止。誇大表現(必ず上がる等)は禁止。
 - 日本語全角=2/半角=1として本文は200単位以内。
 - 最近の投稿と同じ書き出し・同じ言い回しにしない。最近の投稿の書き出し:
@@ -520,7 +521,8 @@ def gen_whoami_v2(api_key, d, kind, recent):
     s = anthropic(api_key, prompt, max_tokens=900)
     for _ in range(2):
         post = s.get("post", "")
-        ok = wlen(post) <= 220 and "http" not in post and "登録不要" not in post and "登録なし" not in post
+        ok = (wlen(post) <= 220 and "http" not in post and "登録不要" not in post and "登録なし" not in post
+              and "125万" not in post)
         if kind == "poll":
             opts = s.get("poll") or []
             ok = ok and 2 <= len(opts) <= 4 and all(0 < len(o) <= 25 for o in opts)
@@ -676,7 +678,8 @@ def main():
         ereply = os.path.join(ROOT, "queue", f"{date}-evening.reply.txt")
         epng = os.path.join(ROOT, "queue", f"{date}-evening.png")
         epoll = os.path.join(ROOT, "queue", f"{date}-evening.poll.json")
-        new_format = os.path.exists(etxt) and os.path.exists(ereply)
+        new_format = (os.path.exists(etxt) and os.path.exists(ereply)
+                      and "125万" not in open(etxt, encoding="utf-8").read())  # 旧い数字(125万)は作り直す
         if not os.path.exists(eposted) and not new_format:
             try:
                 kind = WHOAMI_PLAN[wd]
