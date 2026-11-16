@@ -25,7 +25,9 @@ import urllib.request
 JST = datetime.timezone(datetime.timedelta(hours=9))
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SLOT_JP = {"morning": "朝(用語解説)", "noon": "昼(ITニュース)",
-           "afternoon": "15時(whoami年収診断)", "evening": "夕方(RackShare)", "night": "夜"}
+           "afternoon": "15時(RackShare・水土のみ)", "evening": "18時(whoami年収診断)", "night": "夜"}
+# 15:00 は水・土だけ投稿する(2026-11-16〜)。ほかの曜日は見張らない。
+AFTERNOON_DAYS = (2, 5)
 
 
 def current_slot(now):
@@ -77,6 +79,10 @@ def main():
     slot = os.environ.get("FORCE_SLOT") or current_slot(now)
     if not slot:
         print(f"[watchdog] hour {now.hour} JST is outside any window; nothing to check.")
+        return
+
+    if slot == "afternoon" and now.weekday() not in AFTERNOON_DAYS:
+        print("[watchdog] no afternoon post on this weekday; nothing to check.")
         return
 
     date = f"{now:%Y-%m-%d}"

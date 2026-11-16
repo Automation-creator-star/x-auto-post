@@ -29,12 +29,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INFRAGYM_URL = "https://lp.theit.co.jp/p/DbzLM6ruxTc8?ftid=G9bN143EI7nd"
 INFRAGYM_BANNER = os.path.join(ROOT, "assets", "infragym_banner.png")
 
-# Evening (18:00) = daily RackShare promo (infra-engineer knowledge-sharing site).
+# RackShare promo (infra-engineer knowledge-sharing site): 15:00 on Wed/Sat only (2026-11-16-).
 RACKSHARE_URL = "https://rackshare.jp/"
 
-# Afternoon (15:00) = daily whoami 年収診断 promo. Text only so X shows the site's
-# OGP link-card (whole card is tappable -> better click-through than an image).
-# UTM param marks the traffic as coming from X.
+# (old) 15:00 whoami promo constants, kept for reference. Since 2026-11-16 the
+# whoami post runs at 18:00 via gen_whoami_v2 (link goes in a self-reply).
 WHOAMI_URL = "https://www.whoami-jobs.com/shindan/?utm_source=x&utm_medium=social"
 WHOAMI_ANGLES = [
     "衝撃の事実で止める: 同じ30歳のインフラエンジニアでも、担当工程だけで年収が125万円ちがう。あなたはどちら側か?",
@@ -221,9 +220,10 @@ def purge_duplicates(today):
                 continue
             if too_similar(t, prior[-5:]):
                 os.remove(p)
-                png = p.replace(".txt", ".png")
-                if os.path.exists(png):
-                    os.remove(png)
+                for ext in (".png", ".reply.txt", ".poll.json"):
+                    side = p[:-4] + ext
+                    if os.path.exists(side):
+                        os.remove(side)
                 removed.append(os.path.basename(p))
             else:
                 prior.append(t)
@@ -442,6 +442,112 @@ def gen_whoami(api_key, angle):
     return s
 
 
+# ---------------------------------------------------------------------------
+# whoami 年収診断 (2026-11-16 改訂)
+#   18:00(evening) に毎日。本文にはリンクを入れず、自分の返信(リプ欄)にリンクを置く
+#   (外部リンク付きの投稿は表示が伸びにくいため)。曜日ごとに投稿の型を変える。
+#   15:00(afternoon) は RackShare を水・土だけ。ほかの日は投稿しない。
+# ---------------------------------------------------------------------------
+WHOAMI_BASE = "https://www.whoami-jobs.com/shindan/"
+# 月=0 .. 日=6
+WHOAMI_PLAN = {0: "table", 1: "loss", 2: "poll", 3: "curiosity", 4: "data", 5: "table", 6: "story"}
+WHOAMI_TABLE_IMAGES = [
+    os.path.join(ROOT, "assets", "whoami_table_process.png"),   # 工程×年代の年収表
+    os.path.join(ROOT, "assets", "whoami_table_30s.png"),       # 30代の工程別年収
+]
+RACKSHARE_DAYS = (2, 5)  # 水・土の15:00
+
+WHOAMI_FACTS = """【使ってよい数字(これ以外の金額・割合は書かない)】
+出典: doda「平均年収ランキング2025」の職種別×年代別データを、whoamiが5つの工程に分けて整理した基準額(万円)。
+- 監視・運用: 20代350 / 30代441 / 40代552 / 50代630
+- ネットワーク構築: 20代396 / 30代519 / 40代658 / 50代756
+- サーバ構築: 20代411 / 30代520 / 40代664
+- 設計・上流: 20代439 / 30代594 / 40代723 / 50代851
+- アーキテクト・SRE・PM: 20代517 / 30代705 / 40代855 / 50代867
+- 30歳の基準額: 監視・運用402 / NW構築466 / サーバ構築474 / 設計・上流527 / アーキテクト等624。同じ30歳でも担当工程だけで年収が125万円ちがう(402→527)。
+- 30代の監視・運用(441)とアーキテクト・SRE・PM(705)の差は264万円。
+- 診断の補正: 東京勤務+10.6%、東京以外-5.0%、クラウド実務あり+10%。"""
+
+WHOAMI_STORY_FACTS = """【飯塚(ネスペ社長)本人の事実(これ以外のエピソードは作らない)】
+- 文系出身。大学の先輩に誘われ、25歳で未経験からインフラエンジニアに転職。最初の年収は240万円(月45時間の固定残業込み)。
+- 最初の約1年3か月はネットワーク移行の進捗管理(Excel中心)、次に構築の現場で1年、その後 国産クラウドシステムの設計・構築チームのリーダー。
+- 転職後1年で主任、2年で係長、3年で課長、4年で部長に昇進。
+- 市役所・警察署・バス会社・病院・データセンターなどの現場のネットワークに携わった。
+- 都内のITインフラ企業で人事部長も務め、多くの方の採用面接を行っていた。
+- ネットワークスペシャリスト保有。講師としてCCNA合格者1,000名以上。"""
+
+WHOAMI_REPLIES = [
+    "あなたの年齢・工程・勤務地なら、いま転職するといくらになるか。\n{url}\n無料・8問60秒（メールアドレスを入れるだけ）",
+    "自分の数字は診断でしか分かりません。\n{url}\n無料・8問60秒で想定年収が出ます（メールアドレスの入力が必要です）",
+    "あなたの「適正年収」はこちらで確かめられます。\n{url}\n無料・8問60秒（メールアドレスを入れるだけ）",
+]
+
+WHOAMI_KIND_GUIDE = {
+    "loss": "損失回避型。『相場を知らずに働くと毎年いくら損しているか分からない』という痛みで止める。数字は【使ってよい数字】からだけ。",
+    "curiosity": "好奇心型。『同じ30歳で125万円の差。あなたはどっち側?』のように答えを知りたくさせる。結論は書かずに引く。",
+    "table": "年収表の画像を添付して出す投稿。画像には工程×年代の年収表が載っている。本文は画像を見たくなる1〜2行と『保存しておくと便利です』程度の一言。表の数字を本文に並べすぎない(1つだけ引用するのは可)。",
+    "data": "データ型。【使ってよい数字】から1つの切り口(例: 30代で工程により264万円差、30代で運用から構築に移ると約80万円差、東京勤務は+10.6%など)を取り上げ、意外性のある事実として短く示す。",
+    "story": "ストーリー型。【飯塚本人の事実】から1つのエピソードを選び、読者の今の状況に重ねて『あなたの今の位置を知ることが最初の一歩』につなげる。一人称は「私」。事実にないエピソード・数字は作らない。",
+    "poll": "アンケート型。『あなたの年収、相場と比べてどう?』系の問いで投票してもらう。本文は問いかけ1〜2文。選択肢は4つ(各25文字以内)で、最後は『分からない』系にする。",
+}
+
+
+def whoami_url(d, kind):
+    return f"{WHOAMI_BASE}?utm_source=x&utm_medium=social&utm_campaign=x_{d:%Y%m%d}&utm_content={kind}"
+
+
+def gen_whoami_v2(api_key, d, kind, recent):
+    facts = WHOAMI_STORY_FACTS if kind == "story" else WHOAMI_FACTS
+    poll_spec = ',\n "poll": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"]' if kind == "poll" else ""
+    recent_lines = "\n".join("  - " + r[:60].replace("\n", " ") for r in recent[:6])
+    prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア)の夕方18時の投稿を作ります。
+目的: インフラエンジニア向けの無料「whoami年収診断」に興味を持たせること。ただし本文にはURLもサービス名の宣伝も入れない(リンクは別の返信で出す)。
+投稿の型: {WHOAMI_KIND_GUIDE[kind]}
+{facts}
+
+【ルール】
+- 1行目は指を止めるフック(具体的な数字・意外な事実・あなたへの問い)。抽象的な前置きは書かない。
+- 読者を「あなた」で名指しする。です・ます調ベースで歯切れよく。
+- 本文にURL・ハッシュタグ・「プロフィールのリンクから」等は入れない。最後は『自分の場合はどうか、気になりませんか』のような問いや余韻で終える(返信にリンクが続く前提)。
+- 「登録不要」「登録なし」とは絶対に書かない(診断にはメールアドレスの入力が必要)。
+- 作り話の体験談・実績・数字は禁止。誇大表現(必ず上がる等)は禁止。
+- 日本語全角=2/半角=1として本文は200単位以内。
+- 最近の投稿と同じ書き出し・同じ言い回しにしない。最近の投稿の書き出し:
+{recent_lines}
+
+次のJSONだけを```json ... ```で出力:
+{{"post": "本文(URLなし)"{poll_spec}}}"""
+    s = anthropic(api_key, prompt, max_tokens=900)
+    for _ in range(2):
+        post = s.get("post", "")
+        ok = wlen(post) <= 220 and "http" not in post and "登録不要" not in post and "登録なし" not in post
+        if kind == "poll":
+            opts = s.get("poll") or []
+            ok = ok and 2 <= len(opts) <= 4 and all(0 < len(o) <= 25 for o in opts)
+        if ok:
+            break
+        s = anthropic(api_key, prompt + "\n\n【再指示】前回は条件を満たしていませんでした(長さ200単位以内・URLなし・『登録不要』禁止・選択肢は4つで各25文字以内)。条件を守って作り直してください。", max_tokens=900)
+    post = s.get("post", "")
+    if "http" in post or "登録不要" in post or "登録なし" in post:
+        raise ValueError("whoami post violates rules")
+    url = whoami_url(d, kind)
+    reply = WHOAMI_REPLIES[d.toordinal() % len(WHOAMI_REPLIES)].format(url=url)
+    out = {"post": post.strip(), "reply": reply}
+    if kind == "poll":
+        opts = [o.strip()[:25] for o in (s.get("poll") or [])][:4]
+        if len(opts) < 2:
+            raise ValueError("poll options missing")
+        out["poll"] = opts
+    return out
+
+
+def _remove_slot_files(date, slot):
+    for ext in (".txt", ".png", ".reply.txt", ".poll.json"):
+        p = os.path.join(ROOT, "queue", f"{date}-{slot}{ext}")
+        if os.path.exists(p):
+            os.remove(p)
+
+
 def gen_udemy(api_key, course, angle):
     url = course["url"]
     prompt = f"""あなたはX「ネスペ社長」(@nespe_shacho、株式会社iT代表・元インフラエンジニア、CCNA/CCNP/CISSP教育)の夜の投稿を作ります。
@@ -564,38 +670,56 @@ def main():
             except Exception as e:  # noqa: BLE001
                 print(f"[warn] {date} night failed: {e}", file=sys.stderr)
 
-        # afternoon (15:00) -> daily whoami 年収診断 promo (text only, OGP card)
+        # evening (18:00) -> whoami 年収診断 every day (本文はリンクなし、リンクは返信に)
+        etxt = os.path.join(ROOT, "queue", f"{date}-evening.txt")
+        eposted = os.path.join(ROOT, "posted", f"{date}-evening.txt")
+        ereply = os.path.join(ROOT, "queue", f"{date}-evening.reply.txt")
+        epng = os.path.join(ROOT, "queue", f"{date}-evening.png")
+        epoll = os.path.join(ROOT, "queue", f"{date}-evening.poll.json")
+        new_format = os.path.exists(etxt) and os.path.exists(ereply)
+        if not os.path.exists(eposted) and not new_format:
+            try:
+                kind = WHOAMI_PLAN[wd]
+                s = gen_whoami_v2(api_key, d, kind, recent_texts("evening"))
+                _remove_slot_files(date, "evening")  # 旧RackShare等を消してから書く
+                open(etxt, "w", encoding="utf-8").write(s["post"])
+                open(ereply, "w", encoding="utf-8").write(s["reply"])
+                if kind == "poll":
+                    with open(epoll, "w", encoding="utf-8") as f:
+                        json.dump({"options": s["poll"], "duration_minutes": 1440}, f, ensure_ascii=False)
+                if kind == "table":
+                    img = WHOAMI_TABLE_IMAGES[(d.toordinal() // 7) % len(WHOAMI_TABLE_IMAGES)]
+                    if wd == 5:
+                        img = WHOAMI_TABLE_IMAGES[((d.toordinal() // 7) + 1) % len(WHOAMI_TABLE_IMAGES)]
+                    if os.path.exists(img):
+                        subprocess.run(["cp", img, epng], check=True)
+                made.append(f"{date} evening: whoami({kind})")
+            except Exception as e:  # noqa: BLE001
+                print(f"[warn] {date} evening failed: {e}", file=sys.stderr)
+
+        # afternoon (15:00) -> RackShare on Wed/Sat only; other days nothing
         atxt = os.path.join(ROOT, "queue", f"{date}-afternoon.txt")
         aposted = os.path.join(ROOT, "posted", f"{date}-afternoon.txt")
         apng = os.path.join(ROOT, "queue", f"{date}-afternoon.png")
-        already_whoami = os.path.exists(atxt) and "whoami-jobs.com/shindan" in open(atxt, encoding="utf-8").read()
-        if not os.path.exists(aposted) and not already_whoami:
-            try:
-                angle = WHOAMI_ANGLES[d.toordinal() % len(WHOAMI_ANGLES)]
-                s = gen_whoami(api_key, angle)
-                open(atxt, "w", encoding="utf-8").write(s["post"].strip())
-                if os.path.exists(apng):  # text-only (let X show the OGP link card)
-                    os.remove(apng)
-                made.append(f"{date} afternoon: whoami")
-            except Exception as e:  # noqa: BLE001
-                print(f"[warn] {date} afternoon failed: {e}", file=sys.stderr)
-
-        # evening (18:00) -> daily RackShare promo + card
-        etxt = os.path.join(ROOT, "queue", f"{date}-evening.txt")
-        eposted = os.path.join(ROOT, "posted", f"{date}-evening.txt")
-        epng = os.path.join(ROOT, "queue", f"{date}-evening.png")
-        if not os.path.exists(etxt) and not os.path.exists(eposted):
-            try:
-                angle = RACKSHARE_ANGLES[d.toordinal() % len(RACKSHARE_ANGLES)]
-                s = gen_rackshare(api_key, angle)
-                open(etxt, "w", encoding="utf-8").write(s["post"].strip())
-                render("make_rackshare_card.py",
-                       {k: s[k] for k in ("badge", "headline", "points", "cta_big") if k in s}
-                       | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
-                       epng)
-                made.append(f"{date} evening: rackshare")
-            except Exception as e:  # noqa: BLE001
-                print(f"[warn] {date} evening failed: {e}", file=sys.stderr)
+        if not os.path.exists(aposted):
+            atext = open(atxt, encoding="utf-8").read() if os.path.exists(atxt) else ""
+            if wd not in RACKSHARE_DAYS:
+                if atext:
+                    _remove_slot_files(date, "afternoon")
+                    made.append(f"{date} afternoon: removed (no post on this weekday)")
+            elif "rackshare.jp" not in atext:
+                try:
+                    angle = RACKSHARE_ANGLES[d.toordinal() % len(RACKSHARE_ANGLES)]
+                    s = gen_rackshare(api_key, angle)
+                    _remove_slot_files(date, "afternoon")
+                    open(atxt, "w", encoding="utf-8").write(s["post"].strip())
+                    render("make_rackshare_card.py",
+                           {k: s[k] for k in ("badge", "headline", "points", "cta_big") if k in s}
+                           | ({"head_size": s["head_size"]} if s.get("head_size") else {}),
+                           apng)
+                    made.append(f"{date} afternoon: rackshare")
+                except Exception as e:  # noqa: BLE001
+                    print(f"[warn] {date} afternoon failed: {e}", file=sys.stderr)
 
     print("Generated:\n" + ("\n".join(made) if made else "(nothing — all 7 days already filled)"))
 

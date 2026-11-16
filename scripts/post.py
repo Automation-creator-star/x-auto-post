@@ -7,12 +7,13 @@ file to posted/. If a matching .png exists alongside the .txt, it is
 uploaded and attached to the post (falls back to text-only if the
 media upload fails). Missing queue file = skip quietly (exit 0).
 
-Slots (JST): morning 08-10 / noon 12-14 / night 21-23
+Slots (JST): morning 08-11 / noon 12-14 / afternoon 15-17 / evening 18-20 / night 21-23
 The workflow fires every ~20 minutes inside these windows; the first
 run that finds the slot's queue file posts it (the file is then moved
 to posted/, so later runs in the same window do nothing).
 """
 import datetime
+import json
 import os
 import shutil
 import sys
@@ -74,6 +75,12 @@ def main():
     base = f"{now:%Y-%m-%d}-{slot}"
     txt_path = os.path.join(ROOT, "queue", base + ".txt")
     png_path = os.path.join(ROOT, "queue", base + ".png")
+    # Optional sidecars (2026-11-16):
+    #   <base>.reply.txt  -> posted as a self-reply right after the main post
+    #                        (used to put the link in the reply instead of the body)
+    #   <base>.poll.json  -> {"options": [...], "duration_minutes": 1440} makes it a poll
+    reply_path = os.path.join(ROOT, "queue", base + ".reply.txt")
+    poll_path = os.path.join(ROOT, "queue", base + ".poll.json")
     if not os.path.exists(txt_path):
         print(f"No queued post at queue/{base}.txt; skipping.")
         return
@@ -92,8 +99,20 @@ def main():
     )
     client = tweepy.Client(**auth_kwargs)
 
+    poll = None
+    if os.path.exists(poll_path):
+        try:
+            with open(poll_path, encoding="utf-8") as f:
+                pj = json.load(f)
+            opts = [str(o)[:25] for o in pj.get("options", [])][:4]
+            if len(opts) >= 2:
+                poll = {"poll_options": opts,
+                        "poll_duration_minutes": int(pj.get("duration_minutes", 1440))}
+        except Exception as e:  # noqa: BLE001 - fall back to a normal post
+            print(f"Poll spec unreadable, posting without poll: {e}", file=sys.stderr)
+
     media_ids = None
-    if os.path.exists(png_path):
+    if os.path.exists(png_path) and not poll:
         try:
             auth = tweepy.OAuth1UserHandler(
                 auth_kwargs["consumer_key"],
@@ -108,7 +127,9 @@ def main():
             print(f"Media upload failed, posting text-only: {e}", file=sys.stderr)
 
     try:
-        if media_ids:
+        if poll:
+            resp = client.create_tweet(text=text, **poll)
+        elif media_ids:
             resp = client.create_tweet(text=text, media_ids=media_ids)
         else:
             resp = client.create_tweet(text=text)
@@ -116,8 +137,10 @@ def main():
         # e.g. duplicate content; archive so we don't retry forever
         print(f"Post failed: {e}", file=sys.stderr)
         shutil.move(txt_path, os.path.join(ROOT, "posted", "FAILED-" + base + ".txt"))
-        if os.path.exists(png_path):
-            shutil.move(png_path, os.path.join(ROOT, "posted", "FAILED-" + base + ".png"))
+        for ext in (".png", ".reply.txt", ".poll.json"):
+            side = os.path.join(ROOT, "queue", base + ext)
+            if os.path.exists(side):
+                shutil.move(side, os.path.join(ROOT, "posted", "FAILED-" + base + ext))
         notify_chatwork(
             f"[info][title]X自動投稿: 失敗[/title]{base} の投稿に失敗しました。\n"
             f"エラー: {e}\n文面はリポジトリの posted/FAILED-{base}.txt に退避しています。[/info]"
@@ -127,14 +150,30 @@ def main():
     tweet_id = resp.data["id"]
     url = f"https://x.com/nespe_shacho/status/{tweet_id}"
     print(f"Posted {base}: {url}")
-    slot_names = {"morning": "朝・用語解説", "noon": "昼・ITニュース", "night": "夜・キャリア"}
+
+    reply_note = ""
+    if os.path.exists(reply_path):
+        with open(reply_path, encoding="utf-8") as f:
+            reply_text = f.read().strip()
+        if reply_text:
+            try:
+                r2 = client.create_tweet(text=reply_text, in_reply_to_tweet_id=tweet_id)
+                print(f"Replied with link: https://x.com/nespe_shacho/status/{r2.data['id']}")
+                reply_note = "\n(リンクは返信に投稿済み)"
+            except Exception as e:  # noqa: BLE001 - main post is out; just report
+                print(f"Reply failed: {e}", file=sys.stderr)
+                reply_note = f"\n※リンクの返信に失敗: {e}"
+    slot_names = {"morning": "朝・用語解説", "noon": "昼・ITニュース",
+                  "afternoon": "15時・RackShare", "evening": "18時・年収診断", "night": "夜・キャリア"}
     notify_chatwork(
         f"[info][title]X自動投稿: 完了 ({slot_names.get(slot, slot)})[/title]"
-        f"{text[:60]}{'…' if len(text) > 60 else ''}\n{url}[/info]"
+        f"{text[:60]}{'…' if len(text) > 60 else ''}\n{url}{reply_note}[/info]"
     )
     shutil.move(txt_path, os.path.join(ROOT, "posted", base + ".txt"))
-    if os.path.exists(png_path):
-        shutil.move(png_path, os.path.join(ROOT, "posted", base + ".png"))
+    for ext in (".png", ".reply.txt", ".poll.json"):
+        side = os.path.join(ROOT, "queue", base + ext)
+        if os.path.exists(side):
+            shutil.move(side, os.path.join(ROOT, "posted", base + ext))
 
 
 if __name__ == "__main__":
