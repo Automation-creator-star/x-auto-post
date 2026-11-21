@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">ゼロデイ攻撃</span>確認でiOS緊急更新",
+  "chips": [
+    "iOS 18.1.1",
+    "脆弱性2件",
+    "攻撃確認済"
+  ],
+  "body": "WebKitとJavaScriptCoreの脆弱性が実際に悪用された可能性があり、Apple全製品で即時更新が推奨されています。",
+  "source": "(出典: Apple/各報道)"
+}
