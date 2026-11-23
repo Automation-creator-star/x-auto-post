@@ -1,0 +1,9 @@
+ENARSIの参考書は終えたけど、本番で100問を90分で解き切れるか不安ではありませんか？
+
+私が作った模試講座は、本番と同じ100問×6回の構成。設定・show・debugを読む問題中心で、全選択肢に解説を付けました。試験直前に弱点分野を洗い出せます。
+
+https://www.udemy.com/course/ccnp-enarsi-300-410-practice-exam-jp/?referralCode=390B0E96280FF06EA7FF
+
+本番形式で実力を確認したい方はぜひ。
+
+#CCNP #ENARSI
