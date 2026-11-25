@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">iOS緊急更新</span>でゼロデイ脆弱性に対応",
+  "chips": [
+    "ゼロデイ",
+    "WebKit脆弱性",
+    "11/19公開"
+  ],
+  "body": "JavaScriptCoreとWebKitの脆弱性が実際に悪用された可能性があり、Appleが緊急パッチを配信。早期適用が重要です。",
+  "source": "(出典: Apple)"
+}
