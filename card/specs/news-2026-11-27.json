@@ -1,0 +1,10 @@
+{
+  "headline": "<span class=\"hi\">Azure SQL</span>障害が発生・復旧",
+  "chips": [
+    "11/26発生",
+    "接続エラー",
+    "復旧済み"
+  ],
+  "body": "一部リージョンで障害。クラウドでも障害は起こるため冗長構成が重要です。",
+  "source": "(出典: Microsoft Azure Status)"
+}
